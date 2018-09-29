@@ -1,0 +1,2 @@
+class QueryCompiler(object):
+    pass
