@@ -13,7 +13,7 @@ class TestMedia(unittest.TestCase):
 
     def test_load_mp3(self):
         media = Media()
-        media.load(audio_test_2)
+        media.load(self.audio_test_2)
         self.assertEqual(media.get_title(), 'Doll Dancing')
         self.assertEqual(media.get_artists(), ['Puddle of Inifinty'])
         self.assertEqual(media.get_album(), 'YouTube Audio Library')
@@ -26,13 +26,13 @@ class TestMedia(unittest.TestCase):
 
     def test_load_missing_tags(self):
         media = Media()
-        media.load(unkown_audio)
+        media.load(self.unkown_audio)
         self.assertEqual(media.get_genres(), ['Unkown Genre'])
 
 
     def test_set_delete_title(self):
         media = Media()
-        media.load(audio_test_3)
+        media.load(self.audio_test_3)
         media.set_title('New Title')
         self.assertEqual(media.get_title(), 'New Title')
         media.delete_title()
@@ -40,7 +40,7 @@ class TestMedia(unittest.TestCase):
 
     def test_add_delete_artists(self):
         media = Media()
-        media.load(audio_test_1)
+        media.load(self.audio_test_1)
         media.add_artist('A')
         self.assertEqual(media.get_artists(), ['Silent Partner', 'A'])
         media.delete_artist('Silent Partner')
@@ -51,7 +51,7 @@ class TestMedia(unittest.TestCase):
 
     def test_set_delete_album(self):
         media = Media()
-        media.load(audio_test_1)
+        media.load(self.audio_test_1)
         media.set_album('Original Album')
         self.assertEqual(media.get_album(), 'Original Album')
         media.delete_album()
@@ -59,7 +59,7 @@ class TestMedia(unittest.TestCase):
 
     def test_add_delete_genres(self):
         media = Media()
-        media.load(audio_test_1)
+        media.load(self.audio_test_1)
         media.add_genre('Dark')
         self.assertEqual(media.get_genres(), ['Dance & Electronic', 'Dark'])
         media.delete_genre('Dance & Electronic')
