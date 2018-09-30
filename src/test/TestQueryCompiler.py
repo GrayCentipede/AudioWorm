@@ -40,6 +40,19 @@ class TestQueryCompiler(unittest.TestCase):
         compiler.compile(search_string)
         self.assertEqual(compiler.get_albums(), ['\'Weird\' \"Album\"'])
 
+    def test_invalid_query(self):
+        compiler = QueryCompiler()
+        search_string = 'Made_Up_Field: The Marías'
+        self.assertRaises(SyntaxError, compiler.compile, search_string)
+        search_string = 'Artist: AC/DC)'
+        self.assertRaises(SyntaxError, compiler.compile, search_string)
+        search_string = 'Artist: (Los Blenders'
+        self.assertRaises(SyntaxError, compiler.compile, search_string)
+        search_string = 'Song: \[Gutter Girl'
+        self.assertRaises(SyntaxError, compiler.compile, search_string)
+        search_string = 'Song: Gutter Girl\]'
+        self.assertRaises(SyntaxError, compiler.compile, search_string)
+
     def test_search_multiple(self):
         compiler = QueryCompiler()
         search_string = 'Artist: A1. Song: (S1, S2). Persons: (P1, \[P"2"\])'
