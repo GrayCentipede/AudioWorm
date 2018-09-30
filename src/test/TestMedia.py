@@ -48,6 +48,8 @@ class TestMedia(unittest.TestCase):
         self.assertRaises(ValueError, media.delete_artist, 'Silent Partner')
         media.delete_artist('A')
         self.assertEqual(media.get_artists(), ['Unkown Artist'])
+        media.add_artist('Silent Partner')
+        self.assertEqual(media.get_artists(), ['Silent Partner'])
 
     def test_set_delete_album(self):
         media = Media()
@@ -63,10 +65,12 @@ class TestMedia(unittest.TestCase):
         media.add_genre('Dark')
         self.assertEqual(media.get_genres(), ['Dance & Electronic', 'Dark'])
         media.delete_genre('Dance & Electronic')
-        self.assertEqual(media.get_artists(), ['Dark'])
+        self.assertEqual(media.get_genres(), ['Dark'])
         self.assertRaises(ValueError, media.delete_genre, 'Dark & Electronic')
         media.delete_artist('Dark')
-        self.assertEqual(media.get_artists(), ['Unkown Genre'])
+        self.assertEqual(media.get_genres(), ['Unkown Genre'])
+        media.add_genre('Dance & Electronic')
+        self.assertEqual(media.get_genres(), ['Dance & Electronic'])
 
 if __name__ == '__main__':
 
