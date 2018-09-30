@@ -10,6 +10,7 @@ class Media(object):
     album = None
     genres = None
     length = None
+    path = None
     tags = None
 
     def __init__(self):
@@ -17,7 +18,7 @@ class Media(object):
         self.artists = ['Unknown Artist']
         self.album = 'Unkown Album'
         self.genres = ['Unknown Genre']
-        self.length = ''
+        self.length = self.path = ''
 
     def load(self, filename):
         try:
@@ -34,6 +35,7 @@ class Media(object):
                 for genre in tags['genre']:
                     self.add_genre(genre)
 
+            self.path = filename
             self.set_length(tags.info.length)
 
         except MutagenError:
