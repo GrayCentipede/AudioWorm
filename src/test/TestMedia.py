@@ -4,18 +4,18 @@ from ..Media import Media
 
 class TestMedia(unittest.TestCase):
 
-    audio_test_1 = 'assets/audio/Dark_Step.mp3'
-    audio_test_2 = 'assets/audio/Doll_Dancing.mp3'
-    audio_test_3 = 'assets/audio/Drizzle_to_Downpour.mp3'
-    audio_test_4 = 'assets/audio/Fur_Elise_by_Beethoven.mp3'
-    audio_test_5 = 'assets/audio/Toccata_in_D_minor_by_Bach.mp3'
-    unkown_audio = 'assets/audio/Unkown.mp3'
+    audio_test_1 = './src/test/assets/audio/Dark_Step.mp3'
+    audio_test_2 = './src/test/assets/audio/Doll_Dancing.mp3'
+    audio_test_3 = './src/test/assets/audio/Drizzle_to_Downpour.mp3'
+    audio_test_4 = './src/test/assets/audio/Fur_Elise_by_Beethoven.mp3'
+    audio_test_5 = './src/test/assets/audio/Toccata_in_D_minor_by_Bach.mp3'
+    unkown_audio = './src/test/assets/audio/Unknown.mp3'
 
     def test_load_mp3(self):
         media = Media()
         media.load(self.audio_test_2)
         self.assertEqual(media.get_title(), 'Doll Dancing')
-        self.assertEqual(media.get_artists(), ['Puddle of Inifinty'])
+        self.assertEqual(media.get_artists(), ['Puddle of Infinity'])
         self.assertEqual(media.get_album(), 'YouTube Audio Library')
         self.assertEqual(media.get_genres(), ['Cinematic'])
         self.assertEqual(media.get_length(), '2:23')
@@ -27,7 +27,7 @@ class TestMedia(unittest.TestCase):
     def test_load_missing_tags(self):
         media = Media()
         media.load(self.unkown_audio)
-        self.assertEqual(media.get_genres(), ['Unkown Genre'])
+        self.assertEqual(media.get_genres(), ['Unknown Genre'])
 
 
     def test_set_delete_title(self):
@@ -36,7 +36,7 @@ class TestMedia(unittest.TestCase):
         media.set_title('New Title')
         self.assertEqual(media.get_title(), 'New Title')
         media.delete_title()
-        self.assertEqual(media.get_title(), 'Unkown Song')
+        self.assertEqual(media.get_title(), 'Unknown Song')
 
     def test_add_delete_artists(self):
         media = Media()
@@ -47,7 +47,7 @@ class TestMedia(unittest.TestCase):
         self.assertEqual(media.get_artists(), ['A'])
         self.assertRaises(ValueError, media.delete_artist, 'Silent Partner')
         media.delete_artist('A')
-        self.assertEqual(media.get_artists(), ['Unkown Artist'])
+        self.assertEqual(media.get_artists(), ['Unknown Artist'])
         media.add_artist('Silent Partner')
         self.assertEqual(media.get_artists(), ['Silent Partner'])
 
@@ -57,7 +57,7 @@ class TestMedia(unittest.TestCase):
         media.set_album('Original Album')
         self.assertEqual(media.get_album(), 'Original Album')
         media.delete_album()
-        self.assertEqual(media.get_album(), 'Unkown Album')
+        self.assertEqual(media.get_album(), 'Unknown Album')
 
     def test_add_delete_genres(self):
         media = Media()
@@ -67,8 +67,8 @@ class TestMedia(unittest.TestCase):
         media.delete_genre('Dance & Electronic')
         self.assertEqual(media.get_genres(), ['Dark'])
         self.assertRaises(ValueError, media.delete_genre, 'Dark & Electronic')
-        media.delete_artist('Dark')
-        self.assertEqual(media.get_genres(), ['Unkown Genre'])
+        media.delete_genre('Dark')
+        self.assertEqual(media.get_genres(), ['Unknown Genre'])
         media.add_genre('Dance & Electronic')
         self.assertEqual(media.get_genres(), ['Dance & Electronic'])
 
