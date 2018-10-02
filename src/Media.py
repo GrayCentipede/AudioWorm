@@ -10,13 +10,15 @@ class Media(object):
     album = None
     genres = None
     length = None
+    year = None
+    track = None
     path = None
     tags = None
 
     def __init__(self):
         self.title = 'Unknown Song'
         self.artists = ['Unknown Artist']
-        self.album = 'Unkown Album'
+        self.album = 'Unknown Album'
         self.genres = ['Unknown Genre']
         self.length = self.path = ''
 
@@ -34,6 +36,10 @@ class Media(object):
             if ('genre' in tags):
                 for genre in tags['genre']:
                     self.add_genre(genre)
+            if ('year' in tags):
+                self.set_year(tags['year'][0])
+            if ('track' in tags):
+                self.set_track(tags['track'][0])
 
             self.path = filename
             self.set_length(tags.info.length)
@@ -95,6 +101,18 @@ class Media(object):
         except ValueError:
             raise ValueError('Genre not found in media file: ' + str(genre))
 
+    def set_year(self, year):
+        self.year = year
+
+    def get_year(self):
+        return self.year
+
+    def set_track(self, track):
+        self.track = track
+
+    def get_track(self):
+        return self.track
+
     def set_length(self, seconds):
         minute_w_sec = seconds / 60
         minute = floor(minute_w_sec)
@@ -104,3 +122,6 @@ class Media(object):
 
     def get_length(self):
         return self.length
+
+    def get_path(self):
+        return self.path
