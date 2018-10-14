@@ -20,7 +20,7 @@ class Media(object):
         self.artists = ['Unknown Artist']
         self.album = 'Unknown Album'
         self.genres = ['Unknown Genre']
-        self.length = self.path = ''
+        self.length = self.path = self.track = self.year = ''
 
     def load(self, filename):
         try:
