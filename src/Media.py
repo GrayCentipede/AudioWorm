@@ -20,7 +20,7 @@ class Media(object):
         self.artists = ['Unknown Artist']
         self.album = 'Unknown Album'
         self.genres = ['Unknown Genre']
-        self.length = self.path = ''
+        self.length = self.path = self.year = self.track = ''
 
     def load(self, filename):
         try:
@@ -66,6 +66,23 @@ class Media(object):
     def get_artists(self):
         return self.artists
 
+    def get_artists_str(self):
+        artists = self.artists
+        n = len(artists)
+
+        if (n == 1):
+            return str(artists[0])
+
+        i = 0
+        string = ''
+        for artist in artists:
+            if (i + 1 == n):
+                string += str(artist)
+            else:
+                string += str(artist) +  ', '
+
+        return string
+
     def delete_artist(self, artist):
         try:
             self.artists.remove(artist)
@@ -92,6 +109,23 @@ class Media(object):
 
     def get_genres(self):
         return self.genres
+
+    def get_genres_str(self):
+        genres = self.genres
+        n = len(genres)
+
+        if (n == 1):
+            return str(genres[0])
+
+        i = 0
+        string = ''
+        for genre in genres:
+            if (i + 1 == n):
+                string += str(genre)
+            else:
+                string += str(genre) +  ', '
+
+        return string
 
     def delete_genre(self, genre):
         try:
