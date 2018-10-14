@@ -37,7 +37,7 @@ class App(Gtk.Window):
         self.spinner = Gtk.Spinner()
 
         #Creating the ListStore model
-        self.songs_liststore = Gtk.ListStore(str, str, str, str, str, str, str)
+        self.songs_liststore = Gtk.ListStore(str, str, str, str, str, str, str, int)
 
         #creating the treeview, making it use the filter as a model, and adding the columns
         self.treeview = Gtk.TreeView.new_with_model(self.songs_liststore)
@@ -116,7 +116,7 @@ class App(Gtk.Window):
         subw = SearchWindow()
 
     def open_edit_window(self, win):
-        sube = EditWindow()
+        sube = EditWindow(song = self.selected_song)
 
     def play_song(self, widget):
         if (self.selected_song is not None):
@@ -124,7 +124,7 @@ class App(Gtk.Window):
                 if (self.changed):
                     year = '' if self.selected_song[4] is None else self.selected_song[4]
                     self.player.stop()
-                    self.player.load(self.selected_song[-1])
+                    self.player.load(self.selected_song[-2])
                     self.label_1.set_text("Song: "+ self.selected_song[0] +" \n"
                                           "Performer: "+ self.selected_song[1] +" \n")
                     self.label_2.set_text("Album: "+ self.selected_song[2] +" \n"
