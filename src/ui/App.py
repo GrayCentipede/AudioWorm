@@ -122,12 +122,13 @@ class App(Gtk.Window):
         if (self.selected_song is not None):
             if (not self.playing or self.changed):
                 if (self.changed):
+                    year = '' if self.selected_song[4] is None else self.selected_song[4]
                     self.player.stop()
                     self.player.load(self.selected_song[-1])
                     self.label_1.set_text("Song: "+ self.selected_song[0] +" \n"
                                           "Performer: "+ self.selected_song[1] +" \n")
                     self.label_2.set_text("Album: "+ self.selected_song[2] +" \n"
-                                          "Year: "+ self.selected_song[4] +" \n")
+                                          "Year: "+ year +" \n")
 
                 self.player.play()
                 self.buttons[1].set_label('Pause')

@@ -112,12 +112,11 @@ class Miner(object):
 
     def get_song_id(self, song, id_performer, id_album):
         search_query = 'SELECT id_rola FROM rolas WHERE '
-        search_query += 'id_performer = {} '.format(id_performer)
-        search_query += 'AND id_album = {} '.format(id_album)
-        search_query += 'AND title = \'{}\''.format(song)
-        cursor = self.connection.execute(search_query)
+        search_query += 'id_performer = ? '
+        search_query += 'AND id_album = ? '
+        search_query += 'AND title = ?'
+        cursor = self.connection.execute(search_query, (id_performer, id_album, song))
         rows = cursor.fetchall()
-
         if (len(rows) > 0):
             return rows[0][0]
 
@@ -136,16 +135,17 @@ class Miner(object):
         year = 'null' if album_year is None else str(album_year)
         track = 'null' if album_track is None else str(album_track)
         insert_query = 'INSERT INTO rolas VALUES '
-        insert_query += '({},'.format(new_id)
-        insert_query += ' {},'.format(id_performer)
-        insert_query += ' {},'.format(id_album)
-        insert_query += ' \'{}\','.format(path)
-        insert_query += ' \'{}\','.format(song)
-        insert_query += ' {},'.format(track)
-        insert_query += ' {},'.format(year)
-        insert_query += ' \'{}\')'.format(genre)
+        insert_query += '(?,'
+        insert_query += ' ?,'
+        insert_query += ' ?,'
+        insert_query += ' ?,'
+        insert_query += ' ?,'
+        insert_query += ' ?,'
+        insert_query += ' ?,'
+        insert_query += ' ?)'
 
-        self.connection.execute(insert_query)
+        self.connection.execute(insert_query,
+                                (new_id, id_performer, id_album, path, song, track, year, genre))
         self.connection.commit()
 
     def set_listener(self, f):
