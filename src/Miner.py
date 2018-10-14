@@ -104,7 +104,7 @@ class Miner(object):
         else:
             new_id = str(rows[-1][0] + 1)
 
-        year = 'null' if album_year is None else str(album_year)
+        year = 'null' if album_year is '' else str(album_year)
         insert_query = 'INSERT INTO albums VALUES ({}, \'{}\', \'{}\', {})'.format(new_id, path, album, year)
         self.connection.execute(insert_query)
         self.connection.commit()
@@ -132,8 +132,8 @@ class Miner(object):
         else:
             new_id = str(rows[-1][0] + 1)
 
-        year = 'null' if album_year is None else str(album_year)
-        track = 'null' if album_track is None else str(album_track)
+        year = 'null' if album_year is '' else str(album_year)
+        track = 'null' if album_track is '' else str(album_track)
         insert_query = 'INSERT INTO rolas VALUES '
         insert_query += '(?,'
         insert_query += ' ?,'
