@@ -8,6 +8,7 @@ class Miner(object):
     database_path = None
     connection = None
     cursor = None
+    listener = None
     medias = []
 
     def __init__(self, db_name):
@@ -18,6 +19,9 @@ class Miner(object):
         f_2 = open(self.database_path)
         if (os.stat(self.database_path).st_size == 0):
             self.connection.executescript(content)
+
+    def get_medias(self):
+        return self.medias
 
     def load_db(self, directory):
         if (not os.path.isdir(directory)):
@@ -143,6 +147,12 @@ class Miner(object):
 
         self.connection.execute(insert_query)
         self.connection.commit()
+
+    def set_listener(self, f):
+        self.listener = f
+
+    def sort_medias(self):
+        self.medias = sorted(self.medias, key = lambda m: m.get_artists())
 
     def send_query(self, query):
         cursor = self.connection.execute(query)
