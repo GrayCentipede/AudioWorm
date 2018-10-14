@@ -160,6 +160,7 @@ class App(Gtk.Window):
 
 
 win = App()
+win.set_icon_from_file("./assets/Audioworm_Logo.png")
 win.connect("destroy", Gtk.main_quit)
 win.show_all()
 Gtk.main()
