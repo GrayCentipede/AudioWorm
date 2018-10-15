@@ -38,3 +38,20 @@ class MinerController(object):
             self.instancer.songs_liststore.append([song, performer, album, track,
                                                    year, genre, path, performer_id,
                                                    performer_type, album_id, song_id])
+    def filter(self, rows):
+        self.instancer.songs_liststore.clear()
+        for row in rows:
+            song = row[0]
+            performer = row[1]
+            album = row[2]
+            track = '' if row[3] == 'null' else str(row[3])
+            year = '' if row[4] == 'null' else str(row[4])
+            genre = row[5]
+            path = row[6]
+            performer_id = row[7]
+            performer_type = row[8]
+            album_id = row[9]
+            song_id = row[10]
+            self.instancer.songs_liststore.append([song, performer, album, track,
+                                                   year, genre, path, performer_id,
+                                                   performer_type, album_id, song_id])
