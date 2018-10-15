@@ -109,3 +109,7 @@ class Manager(object):
         query = 'INSERT INTO in_group (id_person, id_group) VALUES (?, ?)'
         self.connection.execute(query, (id_person, id_group))
         self.connection.commit()
+
+    def send_query(self, query):
+        cursor = self.connection.execute(query)
+        return cursor.fetchall()
