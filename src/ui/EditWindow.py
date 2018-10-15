@@ -3,8 +3,21 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf
 from gi.repository.GdkPixbuf import Pixbuf
 
+from ..Manager import Manager
+
 class EditWindow(Gtk.Window):
-    def __init__(self, song):
+
+    manager = None
+    active = '2'
+    type = None
+    parent_window = None
+    entry = None
+
+    def __init__(self, song, parent_window):
+        self.entry = song
+        self.manager = Manager()
+        self.parent_window = parent_window
+
         Gtk.Window.__init__(self, title="Busqueda")
         self.set_border_width(10)
 
@@ -34,13 +47,12 @@ class EditWindow(Gtk.Window):
                        Gtk.Label('Genre'),         #self.labels[5]
                        Gtk.Label('Person/Group'),  #self.labels[6]
                        Gtk.Label('Group:'),        #self.labels[7]
-                       Gtk.Label('Stage name:'),   #self.labels[8]
-                       Gtk.Label('Real name:'),    #self.labels[9]
-                       Gtk.Label('Birth Date:'),   #self.labels[10]
-                       Gtk.Label('Death Date:'),   #self.labels[11]
-                       Gtk.Label('Group Name:'),   #self.labels[12]
-                       Gtk.Label('Start Date:'),   #self.labels[13]
-                       Gtk.Label('End Date:')]     #self.labels[14]
+                       Gtk.Label('Real name:'),    #self.labels[8]
+                       Gtk.Label('Birth Date:'),   #self.labels[9]
+                       Gtk.Label('Death Date:'),   #self.labels[10]
+                       Gtk.Label('Group Name:'),   #self.labels[11]
+                       Gtk.Label('Start Date:'),   #self.labels[12]
+                       Gtk.Label('End Date:')]     #self.labels[13]
 
         self.entries = [Gtk.Entry(),  #Artist entry       - self.entries[0]
                         Gtk.Entry(),  #Album entry        - self.entries[1]
@@ -48,14 +60,13 @@ class EditWindow(Gtk.Window):
                         Gtk.Entry(),  #Year entry         - self.entries[3]
                         Gtk.Entry(),  #Track entry        - self.entries[4]
                         Gtk.Entry(),  #Genre entry        - self.entries[5]
-                        Gtk.Entry(),  #Person/Group entry - self.entries][6]
-                        Gtk.Entry(),  #Stage name entry   - self.entries[7]
-                        Gtk.Entry(),  #Real name entry    - self.entries[8]
-                        Gtk.Entry(),  #Birth date entry   - self.entries[9]
-                        Gtk.Entry(),  #Death date entry   - self.entries][10]
-                        Gtk.Entry(),  #Group name entry   - self.entries[11]
-                        Gtk.Entry(),  #Start date entry   - self.entries[12]
-                        Gtk.Entry()]  #End date entry     - self.entries[13]
+                        Gtk.Entry(),  #Person/Group entry - self.entries[6]
+                        Gtk.Entry(),  #Real name entry    - self.entries[7]
+                        Gtk.Entry(),  #Birth date entry   - self.entries[8]
+                        Gtk.Entry(),  #Death date entry   - self.entries[9]
+                        Gtk.Entry(),  #Group name entry   - self.entries[10]
+                        Gtk.Entry(),  #Start date entry   - self.entries[11]
+                        Gtk.Entry()]  #End date entry     - self.entries[12]
 
         self.entries[0].set_text(song[1])
         self.entries[1].set_text(song[2])
@@ -65,13 +76,13 @@ class EditWindow(Gtk.Window):
         self.entries[5].set_text(song[5])
 
         self.button_is_unknown = Gtk.RadioButton.new_with_mnemonic_from_widget(None, "Unknown")
-        self.button_is_unknown.connect("toggled", self.on_button_toggled, "1")
+        self.button_is_unknown.connect("toggled", self.on_button_toggled, "2")
 
         self.button_is_person = Gtk.RadioButton.new_with_label_from_widget(self.button_is_unknown, "Person")
-        self.button_is_person.connect("toggled", self.on_button_toggled, "2")
+        self.button_is_person.connect("toggled", self.on_button_toggled, "0")
 
         self.button_is_group = Gtk.RadioButton.new_with_label_from_widget(self.button_is_unknown, "Group")
-        self.button_is_group.connect("toggled", self.on_button_toggled, "3")
+        self.button_is_group.connect("toggled", self.on_button_toggled, "1")
 
 
         self.grid.attach(self.album_image, 0, 0, 1, 10)
@@ -90,7 +101,8 @@ class EditWindow(Gtk.Window):
         self.grid.attach_next_to(self.entries[5], self.labels[5], Gtk.PositionType.RIGHT, 3, 1)
 
         # When the performer is type 'UNKNOWN'
-        if (song[-1] == 2):
+        if (song[8] == 2):
+            self.type = 'UNKNOWN'
             self.grid.attach_next_to(self.labels[6], self.labels[5], Gtk.PositionType.BOTTOM, 1, 1)
             self.grid.attach_next_to(self.button_is_group, self.labels[6], Gtk.PositionType.RIGHT, 1, 1)
             self.grid.attach_next_to(self.button_is_person, self.button_is_group, Gtk.PositionType.RIGHT, 1, 1)
@@ -99,34 +111,76 @@ class EditWindow(Gtk.Window):
             self.grid.attach_next_to(self.combo_box, self.labels[7], Gtk.PositionType.RIGHT, 1, 1)
 
         # When the performer is type 'PERSON'
-        elif (song[-1] == 0):
+        elif (song[8] == 0):
+            self.type = 'PERSON'
+            person_info = self.manager.get_person(song[1])
+            real_name = '' if person_info[0] is None else person_info[0]
+            birth_date = '' if person_info[1] is None else person_info[1]
+            death_date = '' if person_info[2] is None else person_info[2]
+
+            self.entries[7].set_text(real_name)
+            self.entries[8].set_text(birth_date)
+            self.entries[9].set_text(death_date)
+
             self.grid.attach_next_to(self.labels[8], self.labels[5], Gtk.PositionType.BOTTOM, 1, 1)
             self.grid.attach_next_to(self.entries[7], self.labels[8], Gtk.PositionType.RIGHT, 3, 1)
             self.grid.attach_next_to(self.labels[9], self.labels[8], Gtk.PositionType.BOTTOM, 1, 1)
             self.grid.attach_next_to(self.entries[8], self.labels[9], Gtk.PositionType.RIGHT, 3, 1)
             self.grid.attach_next_to(self.labels[10], self.labels[9], Gtk.PositionType.BOTTOM, 1, 1)
             self.grid.attach_next_to(self.entries[9], self.labels[10], Gtk.PositionType.RIGHT, 3, 1)
-            self.grid.attach_next_to(self.labels[11], self.labels[10], Gtk.PositionType.BOTTOM, 1, 1)
-            self.grid.attach_next_to(self.entries[10], self.labels[11], Gtk.PositionType.RIGHT, 3, 1)
 
-        # When the performer is type 'UNKNOWN'
+        # When the performer is type 'GROUP'
         else:
-            self.grid.attach_next_to(self.labels[12], self.labels[5], Gtk.PositionType.BOTTOM, 1, 1)
+            self.type = 'GROUP'
+            self.grid.attach_next_to(self.labels[11], self.labels[5], Gtk.PositionType.BOTTOM, 1, 1)
+            self.grid.attach_next_to(self.entries[10], self.labels[11], Gtk.PositionType.RIGHT, 3, 1)
+            self.grid.attach_next_to(self.labels[12], self.labels[11], Gtk.PositionType.BOTTOM, 1, 1)
             self.grid.attach_next_to(self.entries[11], self.labels[12], Gtk.PositionType.RIGHT, 3, 1)
             self.grid.attach_next_to(self.labels[13], self.labels[12], Gtk.PositionType.BOTTOM, 1, 1)
             self.grid.attach_next_to(self.entries[12], self.labels[13], Gtk.PositionType.RIGHT, 3, 1)
-            self.grid.attach_next_to(self.labels[14], self.labels[13], Gtk.PositionType.BOTTOM, 1, 1)
-            self.grid.attach_next_to(self.entries[13], self.labels[14], Gtk.PositionType.RIGHT, 3, 1)
 
 
         self.show_all()
 
     def on_button_toggled(self, button, name):
         if button.get_active():
+            self.active = name
             state = "on"
         else:
             state = "off"
-        print("Button", name, "was turned", state)
 
     def close_window(self, button):
+        artist = self.entries[0].get_text()
+        album =self.entries[1].get_text()
+        title = self.entries[2].get_text()
+        year = self.entries[3].get_text()
+        track = self.entries[4].get_text()
+        genre = self.entries[5].get_text()
+
+        if (self.type == 'UNKNOWN'):
+            status = self.active
+        if (self.type == 'PERSON'):
+            status = '0'
+
+        self.manager.update_performer(performer_id = self.entry[7], performer_name = artist,
+                                      new_status = status)
+        self.manager.update_album(album_id = self.entry[9], album_name = album, album_year = year)
+        self.manager.update_song(song_id = self.entry[10], title = title, year = year, track = track, genre = genre)
+
+        if (self.type == 'UNKNOWN'):
+            if (self.active == '0'):
+                self.manager.insert_person(artist)
+
+            elif (self.active == '1'):
+                print('It is a group')
+
+            self.parent_window.seed_treeview()
+
+        elif (self.type == 'PERSON'):
+            real_name = self.entries[7].get_text()
+            birth_date = self.entries[8].get_text()
+            death_date = self.entries[9].get_text()
+
+            self.manager.update_person(artist, real_name, birth_date, death_date)
+
         self.destroy()
