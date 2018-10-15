@@ -22,13 +22,22 @@ class EditWindow(Gtk.Window):
         self.set_border_width(10)
 
         self.grid = Gtk.Grid()
+        self.grid.set_row_spacing(4)
+        self.grid.set_column_spacing(8)
         self.add(self.grid)
 
         self.save_button = Gtk.Button('Save Changes')
         self.save_button.connect('clicked', self.close_window)
 
         self.available_group = Gtk.ListStore(int, str)
-        self.available_group.append([0, 'New group'])
+        available_groups = self.manager.get_all_groups()
+        available_groups_id = []
+        for group in available_groups:
+            id = group[0]
+            name = group[1]
+            self.available_group.append([id, name])
+            available_groups_id.append(id)
+        self.available_group.append([-1, 'None'])
 
         self.combo_box = Gtk.ComboBox.new_with_model_and_entry(self.available_group)
         self.combo_box.set_entry_text_column(1)
@@ -50,9 +59,8 @@ class EditWindow(Gtk.Window):
                        Gtk.Label('Real name:'),    #self.labels[8]
                        Gtk.Label('Birth Date:'),   #self.labels[9]
                        Gtk.Label('Death Date:'),   #self.labels[10]
-                       Gtk.Label('Group Name:'),   #self.labels[11]
-                       Gtk.Label('Start Date:'),   #self.labels[12]
-                       Gtk.Label('End Date:')]     #self.labels[13]
+                       Gtk.Label('Start Date:'),   #self.labels[11]
+                       Gtk.Label('End Date:')]     #self.labels[12]
 
         self.entries = [Gtk.Entry(),  #Artist entry       - self.entries[0]
                         Gtk.Entry(),  #Album entry        - self.entries[1]
@@ -64,9 +72,8 @@ class EditWindow(Gtk.Window):
                         Gtk.Entry(),  #Real name entry    - self.entries[7]
                         Gtk.Entry(),  #Birth date entry   - self.entries[8]
                         Gtk.Entry(),  #Death date entry   - self.entries[9]
-                        Gtk.Entry(),  #Group name entry   - self.entries[10]
-                        Gtk.Entry(),  #Start date entry   - self.entries[11]
-                        Gtk.Entry()]  #End date entry     - self.entries[12]
+                        Gtk.Entry(),  #Start date entry   - self.entries[10]
+                        Gtk.Entry()]  #End date entry     - self.entries[11]
 
         self.entries[0].set_text(song[1])
         self.entries[1].set_text(song[2])
@@ -107,8 +114,6 @@ class EditWindow(Gtk.Window):
             self.grid.attach_next_to(self.button_is_group, self.labels[6], Gtk.PositionType.RIGHT, 1, 1)
             self.grid.attach_next_to(self.button_is_person, self.button_is_group, Gtk.PositionType.RIGHT, 1, 1)
             self.grid.attach_next_to(self.button_is_unknown, self.button_is_person, Gtk.PositionType.RIGHT, 1, 1)
-            self.grid.attach_next_to(self.labels[7], self.labels[6], Gtk.PositionType.BOTTOM, 1, 1)
-            self.grid.attach_next_to(self.combo_box, self.labels[7], Gtk.PositionType.RIGHT, 1, 1)
 
         # When the performer is type 'PERSON'
         elif (song[8] == 0):
@@ -117,6 +122,14 @@ class EditWindow(Gtk.Window):
             real_name = '' if person_info[0] is None else person_info[0]
             birth_date = '' if person_info[1] is None else person_info[1]
             death_date = '' if person_info[2] is None else person_info[2]
+
+            person_group = self.manager.get_group_person_is_in(song[7])
+
+            if (person_group is None):
+                self.combo_box.set_active(len(self.available_group)-1)
+            else:
+                self.combo_box.set_active(available_groups_id.index(person_group[0]))
+
 
             self.entries[7].set_text(real_name)
             self.entries[8].set_text(birth_date)
@@ -128,16 +141,37 @@ class EditWindow(Gtk.Window):
             self.grid.attach_next_to(self.entries[8], self.labels[9], Gtk.PositionType.RIGHT, 3, 1)
             self.grid.attach_next_to(self.labels[10], self.labels[9], Gtk.PositionType.BOTTOM, 1, 1)
             self.grid.attach_next_to(self.entries[9], self.labels[10], Gtk.PositionType.RIGHT, 3, 1)
+            self.grid.attach_next_to(self.labels[7], self.labels[10], Gtk.PositionType.BOTTOM, 1, 1)
+            self.grid.attach_next_to(self.combo_box, self.labels[7], Gtk.PositionType.RIGHT, 1, 1)
 
         # When the performer is type 'GROUP'
         else:
             self.type = 'GROUP'
+            group_info = self.manager.get_group(song[1])
+            start_date = '' if  group_info[0] is None else group_info[0]
+            end_date = '' if group_info[1] is None else group_info[1]
+
+            self.persons_liststore = Gtk.ListStore(str)
+
+            persons = self.manager.get_persons_in_group(song[1])
+
+            for person in persons:
+                self.persons_liststore.append(person)
+
+            self.persons_treeview = Gtk.TreeView.new_with_model(self.persons_liststore)
+            renderer = Gtk.CellRendererText()
+            column = Gtk.TreeViewColumn('Persons in the group', renderer, text = 0)
+            column.set_expand(True)
+            self.persons_treeview.append_column(column)
+
+            self.entries[10].set_text(start_date)
+            self.entries[11].set_text(end_date)
+
             self.grid.attach_next_to(self.labels[11], self.labels[5], Gtk.PositionType.BOTTOM, 1, 1)
             self.grid.attach_next_to(self.entries[10], self.labels[11], Gtk.PositionType.RIGHT, 3, 1)
             self.grid.attach_next_to(self.labels[12], self.labels[11], Gtk.PositionType.BOTTOM, 1, 1)
             self.grid.attach_next_to(self.entries[11], self.labels[12], Gtk.PositionType.RIGHT, 3, 1)
-            self.grid.attach_next_to(self.labels[13], self.labels[12], Gtk.PositionType.BOTTOM, 1, 1)
-            self.grid.attach_next_to(self.entries[12], self.labels[13], Gtk.PositionType.RIGHT, 3, 1)
+            self.grid.attach_next_to(self.persons_treeview, self.entries[0], Gtk.PositionType.RIGHT, 10, 11)
 
 
         self.show_all()
@@ -153,34 +187,54 @@ class EditWindow(Gtk.Window):
         artist = self.entries[0].get_text()
         album =self.entries[1].get_text()
         title = self.entries[2].get_text()
-        year = self.entries[3].get_text()
-        track = self.entries[4].get_text()
+        track = self.entries[3].get_text()
+        year = self.entries[4].get_text()
         genre = self.entries[5].get_text()
 
         if (self.type == 'UNKNOWN'):
             status = self.active
-        if (self.type == 'PERSON'):
+        elif (self.type == 'PERSON'):
             status = '0'
+        elif (self.type == 'GROUP'):
+            status = '1'
 
         self.manager.update_performer(performer_id = self.entry[7], performer_name = artist,
                                       new_status = status)
         self.manager.update_album(album_id = self.entry[9], album_name = album, album_year = year)
-        self.manager.update_song(song_id = self.entry[10], title = title, year = year, track = track, genre = genre)
+        self.manager.update_song(song_id = self.entry[10], title = title, year = year, track = track,
+                                 genre = genre)
 
         if (self.type == 'UNKNOWN'):
             if (self.active == '0'):
                 self.manager.insert_person(artist)
 
             elif (self.active == '1'):
-                print('It is a group')
-
-            self.parent_window.seed_treeview()
+                self.manager.insert_group(artist)
 
         elif (self.type == 'PERSON'):
             real_name = self.entries[7].get_text()
             birth_date = self.entries[8].get_text()
             death_date = self.entries[9].get_text()
 
+            index = self.combo_box.get_active()
+            model = self.combo_box.get_model()
+            item = model[index]
+            group_id, group_name = item[0], item[1]
+
             self.manager.update_person(artist, real_name, birth_date, death_date)
+
+            if (group_id != -1):
+                try:
+                    self.manager.add_person_to_group(self.entry[1], group_id)
+                except Exception as e:
+                    print(e)
+
+        elif (self.type == 'GROUP'):
+            start_date = self.entries[10].get_text()
+            end_date = self.entries[11].get_text()
+
+            self.manager.update_group(artist, start_date, end_date)
+
+        self.parent_window.seed_treeview()
 
         self.destroy()

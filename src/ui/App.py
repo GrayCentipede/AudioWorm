@@ -41,7 +41,7 @@ class App(Gtk.Window):
 
         #creating the treeview, making it use the filter as a model, and adding the columns
         self.treeview = Gtk.TreeView.new_with_model(self.songs_liststore)
-        for i, column_title in enumerate(["Song", "Performer", "Album", "Track", "Year", "Genre"]):
+        for i, column_title in enumerate(["Song", "Performer", "Album", "Year", "Track", "Genre"]):
             renderer = Gtk.CellRendererText()
             column = Gtk.TreeViewColumn(column_title, renderer, text=i)
             column.set_expand(True)
