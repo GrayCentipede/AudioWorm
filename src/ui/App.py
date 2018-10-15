@@ -118,7 +118,7 @@ class App(Gtk.Window):
         self.spinner.stop()
 
     def open_search_window(self, win):
-        subw = SearchWindow()
+        subw = SearchWindow(parent_window = self)
 
     def open_edit_window(self, win):
         sube = EditWindow(song = self.selected_song, parent_window = self)
