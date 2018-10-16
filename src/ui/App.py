@@ -1,13 +1,17 @@
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GdkPixbuf
+from gi.repository import Gtk, GdkPixbuf, GLib
 from gi.repository.GdkPixbuf import Pixbuf
+
+import array
+import numpy
 
 from time import sleep
 from threading import Thread
 
 from ..MinerController import MinerController
 from ..Player import Player
+from ..Media import Media
 
 from .EditWindow import EditWindow
 from .SearchWindow import SearchWindow
@@ -128,10 +132,7 @@ class App(Gtk.Window):
         select = self.treeview.get_selection()
         select.connect("changed", self.show_data)
 
-        self.player_thread = Thread( target = self.update_progress_bar, daemon=True)
-        self.player_thread.start()
-
-        self.progressbar.pulse()
+        GLib.timeout_add(50, self.update_progress_bar)
 
     def load_database(self, widget):
         self.spinner.start()
@@ -164,14 +165,24 @@ class App(Gtk.Window):
                                           "Year: "+ year +" \n")
 
                 self.player.play()
-                sleep(0.05)
-                self.total_time = self.player.get_length()
 
                 pause_img = Gtk.Image.new_from_icon_name('media-playback-pause-symbolic', Gtk.IconSize.BUTTON)
                 self.buttons[1].set_image(pause_img)
                 self.playing = True
 
                 self.changed = False
+
+                album_image = Media.get_album_cover_of_file(self.selected_song[6])
+                if (album_image):
+                     pixbuf = GdkPixbuf.Pixbuf.new_from_bytes(GLib.Bytes(album_image), 0, True, 8, 200, 200, 200)
+
+                else:
+                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(filename='./assets/default_album_icon.png',
+                                                                     width=200, height=200,
+                                                                     preserve_aspect_ratio=True)
+                self.album_image2.set_from_pixbuf(pixbuf)
+
+
 
             else:
                 self.playing = False
@@ -190,6 +201,7 @@ class App(Gtk.Window):
         self.label_2.set_text("Album: ... \n"
                               "Year: ... \n")
         self.progressbar.set_text('{} - {}'.format('00:00', '00:00'))
+        self.progressbar.set_fraction(0/1)
 
 
     def show_data(self, selection):
@@ -203,16 +215,13 @@ class App(Gtk.Window):
             self.changed = True
 
     def update_progress_bar(self):
-        current = 0
-        self.current_time = ''
-        while (True):
-            if (self.playing):
-                # self.progressbar.set_fraction(current)
-                miliseconds = self.player.player.get_time() / 1000
-                mm, ss = divmod(miliseconds, 60)
-                self.current_time = "%02d:%02d" % (mm,ss)
-                self.progressbar.set_text('{} - {}'.format(self.current_time, self.total_time))
-                # current += 1 / self.player.player.get_length()
+        if (self.playing):
+            miliseconds = self.player.player.get_time() / 1000
+            mm, ss = divmod(miliseconds, 60)
+            self.current_time = "%02d:%02d" % (mm,ss)
+            self.progressbar.set_text('{} - {}'.format(self.current_time, self.player.get_length()))
+            self.progressbar.set_fraction(self.player.player.get_time()/self.player.player.get_length())
+        return True
 
 
 win = App()
