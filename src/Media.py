@@ -1,5 +1,8 @@
 from mutagen.mp3 import EasyMP3 as MP3
+from mutagen.id3 import ID3, APIC
 from mutagen import MutagenError
+
+from PIL import Image
 
 from math import floor
 
@@ -159,3 +162,12 @@ class Media(object):
 
     def get_path(self):
         return self.path
+
+    def get_album_cover_of_file(filename):
+        image_bytes = None
+        audio = ID3(filename)
+        for key in audio.keys():
+            if ('APIC' in key):
+                image_bytes = bytearray(audio[key].data)
+                return image_bytes
+        return None
