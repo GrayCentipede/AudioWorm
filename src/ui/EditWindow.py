@@ -187,8 +187,8 @@ class EditWindow(Gtk.Window):
         artist = self.entries[0].get_text()
         album =self.entries[1].get_text()
         title = self.entries[2].get_text()
-        track = self.entries[3].get_text()
-        year = self.entries[4].get_text()
+        year = self.entries[3].get_text()
+        track = self.entries[4].get_text()
         genre = self.entries[5].get_text()
 
         if (self.type == 'UNKNOWN'):
