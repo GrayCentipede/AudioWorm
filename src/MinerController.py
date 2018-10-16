@@ -27,8 +27,8 @@ class MinerController(object):
             song = row[0]
             performer = row[1]
             album = row[2]
-            track = '' if row[3] == 'null' else str(row[3])
-            year = '' if row[4] == 'null' else str(row[4])
+            year = '' if row[3] == 'null' else str(row[3])
+            track = '' if row[4] == 'null' else str(row[4])
             genre = row[5]
             path = row[6]
             performer_id = row[7]
@@ -44,8 +44,8 @@ class MinerController(object):
             song = row[0]
             performer = row[1]
             album = row[2]
-            track = '' if row[3] == 'null' else str(row[3])
-            year = '' if row[4] == 'null' else str(row[4])
+            year = '' if row[3] == 'null' else str(row[3])
+            track = '' if row[4] == 'null' else str(row[4])
             genre = row[5]
             path = row[6]
             performer_id = row[7]
