@@ -1,4 +1,5 @@
 import vlc
+from math import floor
 
 class Player(object):
 
@@ -23,3 +24,8 @@ class Player(object):
 
     def is_loaded(self):
         return self.loaded
+
+    def get_length(self):
+        miliseconds = self.player.get_length() / 1000
+        mm, ss = divmod(miliseconds, 60)
+        return "%02d:%02d" % (mm,ss)
