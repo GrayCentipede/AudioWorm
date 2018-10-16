@@ -3,6 +3,9 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf
 from gi.repository.GdkPixbuf import Pixbuf
 
+from time import sleep
+from threading import Thread
+
 from ..MinerController import MinerController
 from ..Player import Player
 
@@ -16,6 +19,10 @@ class App(Gtk.Window):
     player = None
     playing = False
     changed = False
+    total_time = None
+    current_time = None
+
+    player_thread = None
 
     def __init__(self):
         self.miner_controller = MinerController(self)
@@ -29,7 +36,7 @@ class App(Gtk.Window):
         #Setting up the self.grid in which the elements are to be positionned
         self.grid = Gtk.Grid()
         self.grid.set_column_homogeneous(True)
-        self.grid.set_row_homogeneous(True)
+        # self.grid.set_row_homogeneous(True)
         self.grid.set_row_spacing(4)
         self.grid.set_column_spacing(4)
         self.add(self.grid)
@@ -50,13 +57,24 @@ class App(Gtk.Window):
         #creating buttons to filter by programming language, and setting up their events
         self.buttons = list()
         for options in ["Edit", "Play", "Stop"]:
-            button = Gtk.Button(options)
+            button = Gtk.Button()
             button.set_sensitive(False)
             self.buttons.append(button)
 
         self.buttons[0].connect('clicked', self.open_edit_window)
+        edit_image = Gtk.Image.new_from_icon_name('document-properties-symbolic', Gtk.IconSize.BUTTON)
+        self.buttons[0].set_image(edit_image)
         self.buttons[1].connect('clicked', self.play_song)
+        play_image = Gtk.Image.new_from_icon_name('media-playback-start-symbolic', Gtk.IconSize.BUTTON)
+        self.buttons[1].set_image(play_image)
         self.buttons[2].connect('clicked', self.stop_song)
+        stop_img = Gtk.Image.new_from_icon_name('media-playback-stop-symbolic', Gtk.IconSize.BUTTON)
+        self.buttons[2].set_image(stop_img)
+
+        width = 0.8 * self.buttons[0].get_allocation().width
+        height = 0.8 * self.buttons[0].get_allocation().height
+
+        self.buttons[0].set_size_request(width, height)
 
         #setting up the layout, putting the treeview in a scrollwindow, and the buttons in a row
 
@@ -68,42 +86,52 @@ class App(Gtk.Window):
 
         self.label_1 = Gtk.Label("Song: ... \n"
                                  "Performer: ... \n")
+        self.label_1.set_line_wrap(True)
+        self.label_1.set_xalign(0)
+        self.label_1.set_max_width_chars(50)
         self.label_2 = Gtk.Label("Album: ... \n"
                                  "Year ... \n")
-
-        self.grid.attach_next_to(self.label_1, self.buttons[-1], Gtk.PositionType.RIGHT, 2, 1)
-        self.grid.attach_next_to(self.label_2, self.label_1, Gtk.PositionType.RIGHT, 2, 1)
+        self.label_2.set_line_wrap(True)
+        self.label_2.set_xalign(0)
 
         self.progressbar = Gtk.ProgressBar()
         self.progressbar.set_text("0:00 - 0:00")
         self.progressbar.set_show_text(True)
-        self.progressbar.set_fraction(1/60)
 
-        self.grid.attach_next_to(self.progressbar, self.label_2, Gtk.PositionType.RIGHT, 2, 1)
-
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale( filename='./assets/default_album_icon.png',
-                                                          width=58, height=58,
+        pixbuf2 = GdkPixbuf.Pixbuf.new_from_file_at_scale( filename='./assets/default_album_icon.png',
+                                                          width=200, height=200,
                                                           preserve_aspect_ratio=True)
 
-        self.album_image = Gtk.Image.new_from_pixbuf(pixbuf)
+        self.album_image2 = Gtk.Image.new_from_pixbuf(pixbuf2)
 
-        self.grid.attach_next_to(self.album_image, self.progressbar, Gtk.PositionType.RIGHT, 2, 1)
-
-        self.search = Gtk.Button('Search')
+        self.search = Gtk.Button()
         self.search.connect('clicked', self.open_search_window)
-        self.grid.attach_next_to(self.search, self.album_image, Gtk.PositionType.RIGHT, 1, 1)
+        edit_img = Gtk.Image.new_from_icon_name('edit-find-symbolic', Gtk.IconSize.BUTTON)
+        self.search.set_image(edit_img)
+        self.grid.attach_next_to(self.search, self.buttons[-1], Gtk.PositionType.RIGHT, 1, 1)
 
-        self.load = Gtk.Button('Load Music')
+        self.load = Gtk.Button()
         self.load.connect('clicked', self.load_database)
+        load_img = Gtk.Image.new_from_icon_name('folder-download-symbolic', Gtk.IconSize.BUTTON)
+        self.load.set_image(load_img)
         self.grid.attach_next_to(self.load, self.search, Gtk.PositionType.RIGHT, 1, 1)
 
-        self.grid.attach_next_to(self.scrollable_treelist, self.buttons[0], Gtk.PositionType.BOTTOM, 13, 12)
+        self.grid.attach_next_to(self.scrollable_treelist, self.buttons[0], Gtk.PositionType.BOTTOM, 10, 2)
         self.scrollable_treelist.add(self.treeview)
 
-        self.grid.attach_next_to(self.spinner, self.scrollable_treelist, Gtk.PositionType.BOTTOM, 1, 1)
+        self.grid.attach_next_to(self.album_image2, self.scrollable_treelist, Gtk.PositionType.BOTTOM, 2, 2)
+
+        self.grid.attach_next_to(self.label_1, self.album_image2, Gtk.PositionType.RIGHT, 5, 1)
+        self.grid.attach_next_to(self.label_2, self.label_1, Gtk.PositionType.BOTTOM, 5, 1)
+        self.grid.attach_next_to(self.progressbar, self.label_1, Gtk.PositionType.RIGHT, 2, 1)
 
         select = self.treeview.get_selection()
         select.connect("changed", self.show_data)
+
+        self.player_thread = Thread( target = self.update_progress_bar, daemon=True)
+        self.player_thread.start()
+
+        self.progressbar.pulse()
 
     def load_database(self, widget):
         self.spinner.start()
@@ -127,7 +155,7 @@ class App(Gtk.Window):
         if (self.selected_song is not None):
             if (not self.playing or self.changed):
                 if (self.changed):
-                    year = '' if self.selected_song[4] is None else self.selected_song[4]
+                    year = '' if self.selected_song[3] is None else self.selected_song[3]
                     self.player.stop()
                     self.player.load(self.selected_song[6])
                     self.label_1.set_text("Song: "+ self.selected_song[0] +" \n"
@@ -136,23 +164,32 @@ class App(Gtk.Window):
                                           "Year: "+ year +" \n")
 
                 self.player.play()
-                self.buttons[1].set_label('Pause')
+                sleep(0.05)
+                self.total_time = self.player.get_length()
+
+                pause_img = Gtk.Image.new_from_icon_name('media-playback-pause-symbolic', Gtk.IconSize.BUTTON)
+                self.buttons[1].set_image(pause_img)
                 self.playing = True
+
                 self.changed = False
+
             else:
                 self.playing = False
-                self.buttons[1].set_label('Play')
+                play_img = Gtk.Image.new_from_icon_name('media-playback-start-symbolic', Gtk.IconSize.BUTTON)
+                self.buttons[1].set_image(play_img)
                 self.player.pause()
 
     def stop_song(self, widget):
         self.player.stop()
         self.playing = False
         self.changed = True
-        self.buttons[1].set_label('Play')
+        play_img = Gtk.Image.new_from_icon_name('media-playback-start-symbolic', Gtk.IconSize.BUTTON)
+        self.buttons[1].set_image(play_img)
         self.label_1.set_text("Song: ... \n"
                               "Performer: ... \n")
         self.label_2.set_text("Album: ... \n"
                               "Year: ... \n")
+        self.progressbar.set_text('{} - {}'.format('00:00', '00:00'))
 
 
     def show_data(self, selection):
@@ -161,8 +198,21 @@ class App(Gtk.Window):
             for button in self.buttons:
                 button.set_sensitive(True)
             self.selected_song = model[treeiter]
-            self.buttons[1].set_label('Play')
+            play_img = Gtk.Image.new_from_icon_name('media-playback-start-symbolic', Gtk.IconSize.BUTTON)
+            self.buttons[1].set_image(play_img)
             self.changed = True
+
+    def update_progress_bar(self):
+        current = 0
+        self.current_time = ''
+        while (True):
+            if (self.playing):
+                # self.progressbar.set_fraction(current)
+                miliseconds = self.player.player.get_time() / 1000
+                mm, ss = divmod(miliseconds, 60)
+                self.current_time = "%02d:%02d" % (mm,ss)
+                self.progressbar.set_text('{} - {}'.format(self.current_time, self.total_time))
+                # current += 1 / self.player.player.get_length()
 
 
 win = App()
