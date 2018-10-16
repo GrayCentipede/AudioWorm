@@ -36,10 +36,10 @@ class Media(object):
             if ('genre' in tags):
                 for genre in tags['genre']:
                     self.add_genre(genre)
-            if ('year' in tags):
-                self.set_year(tags['year'][0])
-            if ('track' in tags):
-                self.set_track(tags['track'][0])
+            if ('date' in tags):
+                self.set_year(tags['date'][0])
+            if ('tracknumber' in tags):
+                self.set_track(tags['tracknumber'][0])
 
             self.path = filename
             self.set_length(tags.info.length)
