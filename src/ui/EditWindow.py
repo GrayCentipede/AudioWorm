@@ -13,7 +13,7 @@ class EditWindow(Gtk.Window):
     parent_window = None
     entry = None
 
-    def __init__(self, song, parent_window):
+    def __init__(self, song, parent_window, album_image):
         self.entry = song
         self.manager = Manager()
         self.parent_window = parent_window
@@ -42,11 +42,7 @@ class EditWindow(Gtk.Window):
         self.combo_box = Gtk.ComboBox.new_with_model_and_entry(self.available_group)
         self.combo_box.set_entry_text_column(1)
 
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale( filename='./assets/default_album_icon.png',
-                                                          width=64, height=64,
-                                                          preserve_aspect_ratio=True)
-
-        self.album_image = Gtk.Image.new_from_pixbuf(pixbuf)
+        self.album_image = Gtk.Image.new_from_pixbuf(album_image)
 
         self.labels = [Gtk.Label('Artist'),        #self.labels[0]
                        Gtk.Label('Album'),         #self.labels[1]

@@ -3,11 +3,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GdkPixbuf, GLib
 from gi.repository.GdkPixbuf import Pixbuf
 
-import array
-import numpy
-
-from time import sleep
-from threading import Thread
+import os
 
 from ..MinerController import MinerController
 from ..Player import Player
@@ -150,7 +146,8 @@ class App(Gtk.Window):
         subw = SearchWindow(parent_window = self)
 
     def open_edit_window(self, win):
-        sube = EditWindow(song = self.selected_song, parent_window = self)
+        sube = EditWindow(song = self.selected_song, parent_window = self,
+                          album_image = self.album_image2.get_pixbuf())
 
     def play_song(self, widget):
         if (self.selected_song is not None):
@@ -165,6 +162,7 @@ class App(Gtk.Window):
                                           "Year: "+ year +" \n")
 
                 self.player.play()
+                self.buttons[0].set_sensitive(True)
 
                 pause_img = Gtk.Image.new_from_icon_name('media-playback-pause-symbolic', Gtk.IconSize.BUTTON)
                 self.buttons[1].set_image(pause_img)
@@ -174,12 +172,18 @@ class App(Gtk.Window):
 
                 album_image = Media.get_album_cover_of_file(self.selected_song[6])
                 if (album_image):
-                     pixbuf = GdkPixbuf.Pixbuf.new_from_bytes(GLib.Bytes(album_image), 0, True, 8, 200, 200, 200)
+                     file = open('album_image.jpg', 'wb')
+                     file.write(album_image)
+                     file.close()
+                     pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(filename='album_image.jpg',
+                                                                      width=200, height=200,
+                                                                      preserve_aspect_ratio=True)
+                     os.unlink('album_image.jpg')
 
                 else:
-                    pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(filename='./assets/default_album_icon.png',
-                                                                     width=200, height=200,
-                                                                     preserve_aspect_ratio=True)
+                     pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(filename='./assets/default_album_icon.png',
+                                                                      width=200, height=200,
+                                                                      preserve_aspect_ratio=True)
                 self.album_image2.set_from_pixbuf(pixbuf)
 
 
@@ -203,12 +207,16 @@ class App(Gtk.Window):
         self.progressbar.set_text('{} - {}'.format('00:00', '00:00'))
         self.progressbar.set_fraction(0/1)
 
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(filename='./assets/default_album_icon.png',
+                                                         width=200, height=200,
+                                                         preserve_aspect_ratio=True)
+        self.album_image2.set_from_pixbuf(pixbuf)
 
     def show_data(self, selection):
         model, treeiter = selection.get_selected()
         if treeiter is not None:
-            for button in self.buttons:
-                button.set_sensitive(True)
+            self.buttons[1].set_sensitive(True)
+            self.buttons[2].set_sensitive(True)
             self.selected_song = model[treeiter]
             play_img = Gtk.Image.new_from_icon_name('media-playback-start-symbolic', Gtk.IconSize.BUTTON)
             self.buttons[1].set_image(play_img)
@@ -220,7 +228,8 @@ class App(Gtk.Window):
             mm, ss = divmod(miliseconds, 60)
             self.current_time = "%02d:%02d" % (mm,ss)
             self.progressbar.set_text('{} - {}'.format(self.current_time, self.player.get_length()))
-            self.progressbar.set_fraction(self.player.player.get_time()/self.player.player.get_length())
+            if (self.player.player.get_length() != 0):
+                self.progressbar.set_fraction(self.player.player.get_time()/self.player.player.get_length())
         return True
 
 
