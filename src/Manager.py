@@ -45,6 +45,9 @@ class Manager(object):
         cursor = self.connection.execute(query, (group_name,))
         rows = cursor.fetchall()
 
+        if (not rows):
+            return rows
+
         query = 'SELECT persons.stage_name FROM in_group JOIN persons WHERE in_group.id_group = ? AND in_group.id_person = persons.id_person'
         cursor = self.connection.execute(query, (rows[0][0],))
         rows = cursor.fetchall()
