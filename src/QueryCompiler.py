@@ -309,4 +309,4 @@ class QueryCompiler(object):
 
             queries.append(genre_query)
 
-        return final_query + ' AND '.join(queries)
+        return final_query + ' AND '.join(queries) + 'ORDER BY performers.name, albums.name, rolas.track'

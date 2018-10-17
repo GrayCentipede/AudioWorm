@@ -12,7 +12,7 @@ class Manager(object):
         query += 'rolas.path, rolas.id_performer, performers.id_type, rolas.id_album, rolas.id_rola '
         query += 'FROM rolas JOIN performers JOIN albums '
         query += 'WHERE rolas.id_performer = performers.id_performer AND rolas.id_album = albums.id_album '
-        query += 'ORDER BY performers.name'
+        query += 'ORDER BY performers.name, albums.name, rolas.track'
         cursor = self.connection.execute(query)
         return cursor.fetchall()
 
