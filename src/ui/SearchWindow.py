@@ -6,6 +6,8 @@ from gi.repository.GdkPixbuf import Pixbuf
 from ..QueryCompiler import QueryCompiler
 from ..Manager import Manager
 
+from .ErrorWindow import ErrorWindow
+
 class SearchWindow(Gtk.Window):
 
     compiler = None
@@ -68,13 +70,16 @@ class SearchWindow(Gtk.Window):
         self.show_all()
 
     def general_search(self, button):
-        entry = self.general_entry.get_text()
-        if (entry != ''):
-            self.compiler.compile(entry)
-            query = self.compiler.get_query()
-            rows = self.manager.send_query(query)
-            self.parent_window.miner_controller.filter(rows)
-        else:
-            self.parent_window.miner_controller.add_rows()
+        try:
+            entry = self.general_entry.get_text()
+            if (entry != ''):
+                self.compiler.compile(entry)
+                query = self.compiler.get_query()
+                rows = self.manager.send_query(query)
+                self.parent_window.miner_controller.filter(rows)
+            else:
+                self.parent_window.miner_controller.add_rows()
 
-        self.destroy()
+            self.destroy()
+        except Exception as e:
+            self.error_win = ErrorWindow(str(e))

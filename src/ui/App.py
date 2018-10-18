@@ -11,6 +11,7 @@ from ..Media import Media
 
 from .EditWindow import EditWindow
 from .SearchWindow import SearchWindow
+from .ErrorWindow import ErrorWindow
 
 class App(Gtk.Window):
 
@@ -153,6 +154,10 @@ class App(Gtk.Window):
         if (self.selected_song is not None):
             if (not self.playing or self.changed):
                 if (self.changed):
+                    if (not self.selected_song.model.iter_is_valid(self.selected_song.iter)):
+                        self.error_win = ErrorWindow('Select a song first.')
+                        return
+
                     year = '' if self.selected_song[3] is None else self.selected_song[3]
                     self.player.stop()
                     self.player.load(self.selected_song[6])
