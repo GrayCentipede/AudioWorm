@@ -1,5 +1,8 @@
 from mutagen.mp3 import EasyMP3 as MP3
+from mutagen.id3 import ID3, APIC
 from mutagen import MutagenError
+
+from PIL import Image
 
 from math import floor
 
@@ -20,7 +23,7 @@ class Media(object):
         self.artists = ['Unknown Artist']
         self.album = 'Unknown Album'
         self.genres = ['Unknown Genre']
-        self.length = self.path = ''
+        self.length = self.path = self.track = self.year = ''
 
     def load(self, filename):
         try:
@@ -36,10 +39,10 @@ class Media(object):
             if ('genre' in tags):
                 for genre in tags['genre']:
                     self.add_genre(genre)
-            if ('year' in tags):
-                self.set_year(tags['year'][0])
-            if ('track' in tags):
-                self.set_track(tags['track'][0])
+            if ('date' in tags):
+                self.set_year(tags['date'][0])
+            if ('tracknumber' in tags):
+                self.set_track(tags['tracknumber'][0])
 
             self.path = filename
             self.set_length(tags.info.length)
@@ -65,6 +68,23 @@ class Media(object):
 
     def get_artists(self):
         return self.artists
+
+    def get_artists_str(self):
+        artists = self.artists
+        n = len(artists)
+
+        if (n == 1):
+            return str(artists[0])
+
+        i = 0
+        string = ''
+        for artist in artists:
+            if (i + 1 == n):
+                string += str(artist)
+            else:
+                string += str(artist) +  ', '
+
+        return string
 
     def delete_artist(self, artist):
         try:
@@ -92,6 +112,23 @@ class Media(object):
 
     def get_genres(self):
         return self.genres
+
+    def get_genres_str(self):
+        genres = self.genres
+        n = len(genres)
+
+        if (n == 1):
+            return str(genres[0])
+
+        i = 0
+        string = ''
+        for genre in genres:
+            if (i + 1 == n):
+                string += str(genre)
+            else:
+                string += str(genre) +  ', '
+
+        return string
 
     def delete_genre(self, genre):
         try:
@@ -125,3 +162,12 @@ class Media(object):
 
     def get_path(self):
         return self.path
+
+    def get_album_cover_of_file(filename):
+        image_bytes = None
+        audio = ID3(filename)
+        for key in audio.keys():
+            if ('APIC' in key):
+                image_bytes = bytearray(audio[key].data)
+                return image_bytes
+        return None

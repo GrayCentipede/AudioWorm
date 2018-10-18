@@ -8,6 +8,7 @@ class Miner(object):
     database_path = None
     connection = None
     cursor = None
+    listener = None
     medias = []
 
     def __init__(self, db_name):
@@ -18,6 +19,9 @@ class Miner(object):
         f_2 = open(self.database_path)
         if (os.stat(self.database_path).st_size == 0):
             self.connection.executescript(content)
+
+    def get_medias(self):
+        return self.medias
 
     def load_db(self, directory):
         if (not os.path.isdir(directory)):
@@ -100,7 +104,7 @@ class Miner(object):
         else:
             new_id = str(rows[-1][0] + 1)
 
-        year = 'null' if album_year is None else str(album_year)
+        year = 'null' if album_year is '' else str(album_year)
         insert_query = 'INSERT INTO albums VALUES ({}, \'{}\', \'{}\', {})'.format(new_id, path, album, year)
         self.connection.execute(insert_query)
         self.connection.commit()
@@ -108,12 +112,11 @@ class Miner(object):
 
     def get_song_id(self, song, id_performer, id_album):
         search_query = 'SELECT id_rola FROM rolas WHERE '
-        search_query += 'id_performer = {} '.format(id_performer)
-        search_query += 'AND id_album = {} '.format(id_album)
-        search_query += 'AND title = \'{}\''.format(song)
-        cursor = self.connection.execute(search_query)
+        search_query += 'id_performer = ? '
+        search_query += 'AND id_album = ? '
+        search_query += 'AND title = ?'
+        cursor = self.connection.execute(search_query, (id_performer, id_album, song))
         rows = cursor.fetchall()
-
         if (len(rows) > 0):
             return rows[0][0]
 
@@ -129,20 +132,27 @@ class Miner(object):
         else:
             new_id = str(rows[-1][0] + 1)
 
-        year = 'null' if album_year is None else str(album_year)
-        track = 'null' if album_track is None else str(album_track)
+        year = 'null' if album_year is '' else str(album_year)
+        track = 'null' if album_track is '' else str(album_track)
         insert_query = 'INSERT INTO rolas VALUES '
-        insert_query += '({},'.format(new_id)
-        insert_query += ' {},'.format(id_performer)
-        insert_query += ' {},'.format(id_album)
-        insert_query += ' \'{}\','.format(path)
-        insert_query += ' \'{}\','.format(song)
-        insert_query += ' {},'.format(track)
-        insert_query += ' {},'.format(year)
-        insert_query += ' \'{}\')'.format(genre)
+        insert_query += '(?,'
+        insert_query += ' ?,'
+        insert_query += ' ?,'
+        insert_query += ' ?,'
+        insert_query += ' ?,'
+        insert_query += ' ?,'
+        insert_query += ' ?,'
+        insert_query += ' ?)'
 
-        self.connection.execute(insert_query)
+        self.connection.execute(insert_query,
+                                (new_id, id_performer, id_album, path, song, track, year, genre))
         self.connection.commit()
+
+    def set_listener(self, f):
+        self.listener = f
+
+    def sort_medias(self):
+        self.medias = sorted(self.medias, key = lambda m: m.get_artists())
 
     def send_query(self, query):
         cursor = self.connection.execute(query)

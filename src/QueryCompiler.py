@@ -1,16 +1,27 @@
 class QueryCompiler(object):
 
     artists = None
-    songs = None
     albums = None
+    songs = None
+    year = None
+    track = None
     persons = None
-    known_fields = ['Artist', 'Song', 'Person', 'Album']
+    group = None
+    content_types = None
+
+    known_fields = ['Artist', 'Album', 'Song', 'Year', 'Track', 'Person', 'Group', 'Genre']
 
     def __init__(self):
         self.artists = []
-        self.songs = []
         self.albums = []
+        self.songs = []
+        self.years = []
+        self.tracks = []
+        self.genres = []
         self.persons = []
+        self.groups = []
+        self.content_types = []
+
 
     def compile(self, search_string):
         special_chars = ['á', 'é', 'í', 'ó', 'ú']
@@ -151,14 +162,24 @@ class QueryCompiler(object):
     def set_content(self, field, contents):
         if (field == 'Artist'):
             self.artists = contents
-        elif (field == 'Song'):
-            self.songs = contents
-        elif (field == 'Person'):
-            self.persons = contents
         elif (field == 'Album'):
             self.albums = contents
+        elif (field == 'Song'):
+            self.songs = contents
+        elif (field == 'Year'):
+            self.years = contents
+        elif (field == 'Track'):
+            self.tracks = contents
+        elif (field == 'Person'):
+            self.persons = contents
+        elif (field == 'Group'):
+            self.albums = contents
+        elif (field == 'Genre'):
+            self.genres = contents
         else:
             raise ValueError('Field was not recognized')
+
+        self.content_types.append(field)
 
     def parse(self, field, content):
         field = field.strip()
@@ -182,4 +203,110 @@ class QueryCompiler(object):
         return self.persons
 
     def get_query(self):
-        pass
+        final_query =  'SELECT rolas.title,'
+        final_query += '       performers.name,'
+        final_query += '       albums.name,'
+        final_query += '       rolas.track,'
+        final_query += '       rolas.year,'
+        final_query += '       rolas.genre,'
+        final_query += '       rolas.path,'
+        final_query += '       rolas.id_performer,'
+        final_query += '       performers.id_type,'
+        final_query += '       rolas.id_album,'
+        final_query += '       rolas.id_rola '
+        final_query += 'FROM rolas JOIN performers JOIN albums '
+        final_query += 'WHERE '
+
+        queries = ['rolas.id_performer = performers.id_performer AND rolas.id_album = albums.id_album']
+
+        if (len(self.artists) > 0):
+            artist_query = '('
+            if (len(self.artists) == 1):
+                artist_query += 'performers.name LIKE \'%{}%\')'.format(self.artists[0])
+            else:
+                i = 0
+                for artist in self.artists:
+                    if (i + 1 < len(self.artists)):
+                        artist_query += 'performers.name LIKE \'%{}%\' OR '.format(artist)
+                    else:
+                        artist_query += 'performers.name LIKE \'%{}%\')'.format(artist)
+                    i += 1
+
+            queries.append(artist_query)
+
+        if (len(self.albums) > 0):
+            album_query = '('
+            if (len(self.albums) == 1):
+                album_query += 'albums.name LIKE \'%{}%\')'.format(self.albums[0])
+            else:
+                i = 0
+                for album in self.albums:
+                    if (i + 1 < len(self.albums)):
+                        album_query += 'performers.name LIKE \'%{}%\' OR '.format(album)
+                    else:
+                        album_query += 'performers.name LIKE \'%{}%\')'.format(album)
+                    i += 1
+
+            queries.append(album_query)
+
+        if (len(self.songs) > 0):
+            song_query = '('
+            if (len(self.songs) == 1):
+                song_query += 'rolas.title LIKE \'%{}%\')'.format(self.songs[0])
+            else:
+                i = 0
+                for song in self.songs:
+                    if (i + 1 < len(self.songs)):
+                        song_query += 'rolas.title LIKE \'%{}%\' OR '.format(song)
+                    else:
+                        song_query += 'rolas.title LIKE \'%{}%\')'.format(song)
+                    i += 1
+
+            queries.append(song_query)
+
+        if (len(self.years) > 0):
+            year_query = '('
+            if (len(self.years) == 1):
+                year_query += 'rolas.year LIKE \'%{}%\')'.format(self.years[0])
+            else:
+                i = 0
+                for track in self.years:
+                    if (i + 1 < len(self.years)):
+                        year_query += 'rolas.year LIKE \'%{}%\' OR '.format(track)
+                    else:
+                        year_query += 'rolas.year LIKE \'%{}%\')'.format(track)
+                    i += 1
+
+            queries.append(year_query)
+
+        if (len(self.tracks) > 0):
+            track_query = '('
+            if (len(self.tracks) == 1):
+                track_query += 'rolas.track LIKE \'%{}%\')'.format(self.tracks[0])
+            else:
+                i = 0
+                for track in self.tracks:
+                    if (i + 1 < len(self.tracks)):
+                        track_query += 'rolas.track LIKE \'%{}%\' OR '.format(track)
+                    else:
+                        track_query += 'rolas.track LIKE \'%{}%\')'.format(track)
+                    i += 1
+
+            queries.append(track_query)
+
+        if (len(self.genres) > 0):
+            genre_query = '('
+            if (len(self.genres) == 1):
+                genre_query += 'rolas.genre LIKE \'%{}%\')'.format(self.genres[0])
+            else:
+                i = 0
+                for genre in self.genres:
+                    if (i + 1 < len(self.genres)):
+                        genre_query += 'rolas.genre LIKE \'%{}%\' OR '.format(genre)
+                    else:
+                        genre_query += 'rolas.genre LIKE \'%{}%\')'.format(genre)
+                    i += 1
+
+            queries.append(genre_query)
+
+        return final_query + ' AND '.join(queries) + 'ORDER BY performers.name, albums.name, rolas.track'
