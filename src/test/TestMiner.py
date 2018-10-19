@@ -1,4 +1,5 @@
 import unittest
+import warnings
 import os
 
 from ..Miner import Miner
@@ -8,10 +9,12 @@ class TestMiner(unittest.TestCase):
     miner = None
 
     def setUp(self):
+        warnings.simplefilter("ignore", ResourceWarning)
         self.miner = Miner('audioworm_test')
         self.miner.load_db(self.path)
 
     def test_error_load(self):
+        warnings.simplefilter("ignore", ResourceWarning)
         decoy_miner = Miner('audioworm_test')
         self.assertRaises(FileNotFoundError, decoy_miner.load_db, './src/test/assets/non-existant-dir/')
 
@@ -53,5 +56,5 @@ class TestMiner(unittest.TestCase):
 if __name__ == '__main__':
 
     suite = unittest.TestLoader().loadTestsFromTestCase(TestMiner)
-    unittest.TextTestRunner(verbosity=2).run(suite)
+    unittest.TextTestRunner(verbosity=2, warnings = 'ignore').run(suite)
     os.unlink('./sql/audioworm_test.db')
