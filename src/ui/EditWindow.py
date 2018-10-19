@@ -5,7 +5,24 @@ from gi.repository.GdkPixbuf import Pixbuf
 
 from ..Manager import Manager
 
+"""
+A class for the window that will be used to edit songs.
+To generate HTML documentation for this module use the command:
+
+    pydoc -w src.ui.EditWindow
+
+"""
+
 class EditWindow(Gtk.Window):
+    """
+    EditWindow has a group of entries, each entry for each tag of a media
+    It encapsulates:
+        manager - The manager that will handle the database and its queries
+        active - The radio button that is active
+        type - If the song's performer is a group, a person or it is unknown.
+        parent_window - The window it comes from
+        entry - The song that is going to be edited
+    """
 
     manager = None
     active = '2'
@@ -14,6 +31,14 @@ class EditWindow(Gtk.Window):
     entry = None
 
     def __init__(self, song, parent_window, album_image):
+        """
+        Creates an EditWindow.
+
+        :param song: The song to edit
+        :param parent_window: The window it comes from
+        :param album_image: The song's cover
+        """
+
         self.entry = song
         self.manager = Manager()
         self.parent_window = parent_window
@@ -173,13 +198,23 @@ class EditWindow(Gtk.Window):
         self.show_all()
 
     def on_button_toggled(self, button, name):
+        """
+        Gets the radio button that was clicked
+
+        :param button: The button clicked
+        :param name: The name of the radio button
+        """
+
         if button.get_active():
             self.active = name
-            state = "on"
-        else:
-            state = "off"
 
     def close_window(self, button):
+        """
+        Closes the window but first it updates the song.
+
+        :param button: The button clicked
+        """
+
         artist = self.entries[0].get_text()
         album =self.entries[1].get_text()
         title = self.entries[2].get_text()

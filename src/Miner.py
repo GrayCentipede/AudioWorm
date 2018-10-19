@@ -4,7 +4,25 @@ import glob
 
 from .Media import Media
 
+"""
+A class for the MP3 files miner called Miner.
+To generate HTML documentation for this module use the command:
+
+    pydoc -w src.Miner
+
+"""
+
 class Miner(object):
+    """
+    Media is the one who stores all the tags of an MP3 file
+    It encapsulates:
+        database_path - The database's path
+        connection - The connection to the database
+        cursor - The cursor of the connection
+        listener - A listener
+        medias - The list of medias
+    """
+
     database_path = None
     connection = None
     cursor = None
@@ -12,6 +30,14 @@ class Miner(object):
     medias = []
 
     def __init__(self, db_name):
+        """
+        Creates a Miner with an established connection to the database.
+        In case it doesn't exist then it creates it from the sql file that contains the data definition
+        language (DDL).
+
+        :param db_name: The database name
+        """
+
         self.database_path = './sql/' + db_name + '.db'
         self.connection = sqlite3.connect(self.database_path)
         f_1 = open('./sql/rolas.sql', 'r')
@@ -21,9 +47,21 @@ class Miner(object):
             self.connection.executescript(content)
 
     def get_medias(self):
+        """
+        Returns all the medias that have been loaded.
+
+        :return: The medias that have been loaded
+        """
+
         return self.medias
 
     def load_db(self, directory):
+        """
+        Gets all the MP3 files of the given directory and it seeds the database with their information.
+
+        :param directory: The directory where the MP3 can be found
+        """
+
         if (not os.path.isdir(directory)):
             raise FileNotFoundError('Directory ' + directory + ' not found.')
 
@@ -36,6 +74,10 @@ class Miner(object):
         self.seed_db()
 
     def seed_db(self):
+        """
+        Seeds the database with the media's information
+        """
+
         for media in self.medias:
             path = media.get_path()
             year = media.get_year()
@@ -60,6 +102,13 @@ class Miner(object):
                 self.insert_song(artist_id, album_id, path, title, track, year, genre)
 
     def get_performer_id(self, artist):
+        """
+        Gets the performer's id of a given artist.
+
+        :param artist: The artist's name
+        :return: None if it doesn't exist, the performer's id in other case
+        """
+
         search_query = 'SELECT id_performer FROM performers WHERE name = \'{}\''.format(artist)
         cursor = self.connection.execute(search_query)
         rows = cursor.fetchall()
@@ -70,6 +119,12 @@ class Miner(object):
         return None
 
     def insert_performer(self, artist):
+        """
+        Inserts a performer in the database
+
+        :param artist: The artist to insert
+        """
+
         search_query = 'SELECT id_performer FROM performers'
         cursor = self.connection.execute(search_query)
         rows = cursor.fetchall()
@@ -85,6 +140,13 @@ class Miner(object):
         return new_id
 
     def get_album_id(self, album_title):
+        """
+        Gets the album's id of a title.
+
+        :param album_title: The album's title
+        :return: None if it doesn't exist, the album's id in other case
+        """
+
         search_query = 'SELECT id_album FROM albums WHERE name = \'{}\''.format(album_title)
         cursor = self.connection.execute(search_query)
         rows = cursor.fetchall()
@@ -95,6 +157,14 @@ class Miner(object):
         return None
 
     def insert_album(self, album, path, album_year):
+        """
+        Inserts an album in the database
+
+        :param album: The album to insert
+        :param path: The album's path
+        :param album_year: The album's year
+        """
+
         search_query = 'SELECT id_album FROM albums'
         cursor = self.connection.execute(search_query)
         rows = cursor.fetchall()
@@ -111,6 +181,15 @@ class Miner(object):
         return new_id
 
     def get_song_id(self, song, id_performer, id_album):
+        """
+        Gets the song's id of a title.
+
+        :param song: The song's title
+        :param id_performer: The id of the song's performer
+        :param id_album: The id of the song's album
+        :return: None if it doesn't exist, the song's id in other case
+        """
+
         search_query = 'SELECT id_rola FROM rolas WHERE '
         search_query += 'id_performer = ? '
         search_query += 'AND id_album = ? '
@@ -123,6 +202,18 @@ class Miner(object):
         return None
 
     def insert_song(self, id_performer, id_album, path, song, album_track, album_year, genre):
+        """
+        Inserts a song in the database
+
+        :param id_performer: The id of the song's performer
+        :param id_album: The id of the song's album
+        :param path: The song's path
+        :param song: The song's title
+        :param album_track: The song's track
+        :param album_year: The album's year
+        :param genre: The song's genre
+        """
+
         search_query = 'SELECT id_rola FROM rolas'
         cursor = self.connection.execute(search_query)
         rows = cursor.fetchall()
@@ -149,14 +240,32 @@ class Miner(object):
         self.connection.commit()
 
     def set_listener(self, f):
+        """
+        Sets a listener
+
+        :param f: The function that will be the listener
+        """
+
         self.listener = f
 
     def sort_medias(self):
+        """
+        Sort the medias by artist.
+        """
+
         self.medias = sorted(self.medias, key = lambda m: m.get_artists())
 
     def send_query(self, query):
+        """
+        Sends a query to the database.
+        """
+
         cursor = self.connection.execute(query)
         return cursor.fetchall()
 
     def dump_db(self):
+        """
+        Deletes the database
+        """
+
         os.unlink(self.database_path)

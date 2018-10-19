@@ -6,7 +6,28 @@ from PIL import Image
 
 from math import floor
 
+"""
+A class for the MP3 files called Media.
+To generate HTML documentation for this module use the command:
+
+    pydoc -w src.Media
+
+"""
+
 class Media(object):
+    """
+    Media is the one who stores all the tags of an MP3 file
+    It encapsulates:
+        title -  The media's title
+        artists - The media's artists
+        album - The media's album
+        genres - The media's genre
+        length - The media's length
+        year - The media's year
+        track - The media's track
+        path - The media's path on the system
+        tags - The media's tag
+    """
 
     title = None
     artists = None
@@ -19,6 +40,10 @@ class Media(object):
     tags = None
 
     def __init__(self):
+        """
+        Creates a Media with the default contents of an MP3 files.
+        """
+
         self.title = 'Unknown Song'
         self.artists = ['Unknown Artist']
         self.album = 'Unknown Album'
@@ -26,6 +51,12 @@ class Media(object):
         self.length = self.path = self.track = self.year = ''
 
     def load(self, filename):
+        """
+        Loads a Media with all the tags of a given MP3
+
+        :param filename: The path of the MP3 file
+        """
+
         try:
             tags = MP3(filename)
 
@@ -51,15 +82,37 @@ class Media(object):
             raise FileNotFoundError('File not found: ' + str(filename))
 
     def set_title(self, new_title):
+        """
+        Changes the title for the media
+
+        :param new_title: The new title
+        """
+
         self.title = new_title
 
     def get_title(self):
+        """
+        Gets the title of a Media
+
+        :return: The media's title
+        """
+
         return self.title
 
     def delete_title(self):
+        """
+        Deletes the title of the media and sets it to: 'Unknown Song'
+        """
+
         self.title = 'Unknown Song'
 
     def add_artist(self, new_artist):
+        """
+        Adds a new artist for the media
+
+        :param new_artist: The new artist
+        """
+
         if ('Unknown Artist' in self.artists):
             self.artists.pop()
             self.artists.append(new_artist)
@@ -67,9 +120,21 @@ class Media(object):
             self.artists.append(new_artist)
 
     def get_artists(self):
+        """
+        Gets the artists of a Media
+
+        :return: The media's artists
+        """
+
         return self.artists
 
     def get_artists_str(self):
+        """
+        Gets the artists of a Media in string format
+
+        :return: The media's artists in a string format
+        """
+
         artists = self.artists
         n = len(artists)
 
@@ -87,6 +152,10 @@ class Media(object):
         return string
 
     def delete_artist(self, artist):
+        """
+        Deletes an artists in a media, if there are no more artists then it is set as 'Unknown Artist'
+        """
+
         try:
             self.artists.remove(artist)
             if (len(self.artists) == 0):
@@ -95,6 +164,12 @@ class Media(object):
             raise ValueError('Artist not found in media file: ' + str(artist))
 
     def set_album(self, new_album):
+        """
+        Changes the album for the media
+
+        :param new_album: The new album's name
+        """
+
         self.album = new_album
 
     def get_album(self):

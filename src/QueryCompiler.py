@@ -1,4 +1,23 @@
+"""
+A class for the query compiler.
+To generate HTML documentation for this module use the command:
+
+    pydoc -w src.QueryCompiler
+
+"""
+
 class QueryCompiler(object):
+    """
+    Player is the one the plays the music.
+    It encapsulates:
+        artists - A list of the artists found in the search query
+        albums - A list of the albums found in the search query
+        songs - A list of the songs found in the search query
+        year - A list of the years found in the search query
+        track - A list of the tracks found in the search query
+        persons - A list of the persons found in the search query
+        group - A list of the groups found in the search query
+    """
 
     artists = None
     albums = None
@@ -7,11 +26,14 @@ class QueryCompiler(object):
     track = None
     persons = None
     group = None
-    content_types = None
 
     known_fields = ['Artist', 'Album', 'Song', 'Year', 'Track', 'Person', 'Group', 'Genre']
 
     def __init__(self):
+        """
+        Creates a compiler.
+        """
+
         self.artists = []
         self.albums = []
         self.songs = []
@@ -20,10 +42,15 @@ class QueryCompiler(object):
         self.genres = []
         self.persons = []
         self.groups = []
-        self.content_types = []
 
 
     def compile(self, search_string):
+        """
+        Compiles the given search string.
+
+        :param search_string: The string that contains all the entities to search
+        """
+
         special_chars = ['á', 'é', 'í', 'ó', 'ú']
         fields = []
         contents = []
@@ -116,6 +143,13 @@ class QueryCompiler(object):
             self.parse(fields[i], contents[i])
 
     def parse_content(self, string):
+        """
+        Parses the string to a list format
+
+        :param string: The string to parse
+        :return: A list with the contents of the string
+        """
+
         content = []
         commas_index = []
         in_special_input = False
@@ -160,6 +194,13 @@ class QueryCompiler(object):
 
 
     def set_content(self, field, contents):
+        """
+        Assigns the contents to a field.
+
+        :param field: The field
+        :param contents: The contents
+        """
+
         if (field == 'Artist'):
             self.artists = contents
         elif (field == 'Album'):
@@ -179,9 +220,14 @@ class QueryCompiler(object):
         else:
             raise ValueError('Field was not recognized')
 
-        self.content_types.append(field)
-
     def parse(self, field, content):
+        """
+        Parses the contents of a string and assigns them to a field
+
+        :param field: The field
+        :param content: The contents
+        """
+
         field = field.strip()
         if field not in self.known_fields:
             e = 'Field '+ field +' is not accepted'
@@ -191,18 +237,48 @@ class QueryCompiler(object):
         self.set_content(field, contents)
 
     def get_artists(self):
+        """
+        Returns the artists found
+
+        :return: The artists found
+        """
+
         return self.artists
 
     def get_songs(self):
+        """
+        Returns the songs found
+
+        :return: The songs found
+        """
+
         return self.songs
 
     def get_albums(self):
+        """
+        Returns the albums found
+
+        :return: The albums found
+        """
+
         return self.albums
 
     def get_persons(self):
+        """
+        Returns the persons found
+
+        :return: The persons found
+        """
+
         return self.persons
 
     def get_query(self):
+        """
+        Returns the search string in a SQL format query.
+
+        :return: The SQL format query
+        """
+        
         final_query =  'SELECT rolas.title,'
         final_query += '       performers.name,'
         final_query += '       albums.name,'

@@ -13,19 +13,38 @@ from .EditWindow import EditWindow
 from .SearchWindow import SearchWindow
 from .ErrorWindow import ErrorWindow
 
+"""
+A class for the general window of the app
+To generate HTML documentation for this module use the command:
+
+    pydoc -w src.ui.App
+
+"""
+
 class App(Gtk.Window):
+    """
+    EditWindow has a group of entries, each entry for each tag of a media
+    It encapsulates:
+        miner_controller - The controller for the miner
+        selected_song - The selected song on the treeview
+        player - The music player
+        playing - A boolean that tells us whether or not the music is playing
+        changed - A boolean that tells us whether or not the user has clicked another song
+        current_time - Gets the current time of a played song in string format
+    """
 
     miner_controller = None
     selected_song = None
     player = None
     playing = False
     changed = False
-    total_time = None
     current_time = None
 
-    player_thread = None
-
     def __init__(self):
+        """
+        Creates the general window for the app
+        """
+
         self.miner_controller = MinerController(self)
         self.selected_song = None
         self.player = Player()
@@ -133,6 +152,12 @@ class App(Gtk.Window):
         GLib.timeout_add(50, self.update_progress_bar)
 
     def load_database(self, widget):
+        """
+        Loads all the songs from the database and updates the treeview.
+
+        :param widget: The widget that realized the action
+        """
+
         self.spinner.start()
         self.miner_controller.load_miner()
         self.miner_controller.add_rows()
@@ -141,18 +166,40 @@ class App(Gtk.Window):
         self.search.set_sensitive(True)
 
     def seed_treeview(self):
+        """
+        Updates the treeview
+        """
+
         self.spinner.start()
         self.miner_controller.add_rows()
         self.spinner.stop()
 
-    def open_search_window(self, win):
+    def open_search_window(self, button):
+        """
+        Opens the search window
+
+        :param button: The button clicked
+        """
+
         subw = SearchWindow(parent_window = self)
 
     def open_edit_window(self, win):
+        """
+        Opens the edit window
+
+        :param button: The button clicked
+        """
+
         sube = EditWindow(song = self.selected_song, parent_window = self,
                           album_image = self.album_image2.get_pixbuf())
 
-    def play_song(self, widget):
+    def play_song(self, button):
+        """
+        Plays the song that user has selected.
+
+        :param button: The button clicked
+        """
+
         if (self.selected_song is not None):
             if (not self.playing or self.changed):
                 if (self.changed):
@@ -201,7 +248,13 @@ class App(Gtk.Window):
                 self.buttons[1].set_image(play_img)
                 self.player.pause()
 
-    def stop_song(self, widget):
+    def stop_song(self, button):
+        """
+        Stops playing the song
+
+        :param button: The button clicked
+        """
+
         self.player.stop()
         self.playing = False
         self.changed = True
@@ -220,6 +273,12 @@ class App(Gtk.Window):
         self.album_image2.set_from_pixbuf(pixbuf)
 
     def show_data(self, selection):
+        """
+        Activates all the song related buttons when the user selects a song.
+
+        :param selection: The selected column
+        """
+
         model, treeiter = selection.get_selected()
         if treeiter is not None:
             self.buttons[0].set_sensitive(False)
@@ -231,6 +290,10 @@ class App(Gtk.Window):
             self.changed = True
 
     def update_progress_bar(self):
+        """
+        Updates the progress bar with the player's information.
+        """
+
         if (self.playing):
             miliseconds = self.player.player.get_time() / 1000
             mm, ss = divmod(miliseconds, 60)

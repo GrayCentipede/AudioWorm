@@ -8,13 +8,33 @@ from ..Manager import Manager
 
 from .ErrorWindow import ErrorWindow
 
+"""
+A class for the window that will be used to search songs.
+To generate HTML documentation for this module use the command:
+
+    pydoc -w src.ui.SearchWindow
+
+"""
+
 class SearchWindow(Gtk.Window):
+    """
+    SearchWindow has an entry where the user will place its search query.
+    It encapsulates:
+        compiler - The compiler that will compile the search query
+        parent_window - The window it comes from
+        manager - The manager that will handle the database and its queries
+    """
 
     compiler = None
     parent_window = None
     manager = None
 
     def __init__(self, parent_window):
+        """
+        Creates the SearchWindow
+
+        :param parent_window: The window it comes from
+        """
 
         self.parent_window = parent_window
 
@@ -52,6 +72,12 @@ class SearchWindow(Gtk.Window):
         self.show_all()
 
     def general_search(self, button):
+        """
+        Processes the search string that the user introduced.
+
+        :param button: The button that was clicked
+        """
+        
         try:
             entry = self.general_entry.get_text()
             if (entry != ''):
