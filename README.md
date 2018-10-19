@@ -1,6 +1,6 @@
 <img src="assets/Logo.png" width="400" heigth="200">
-# AudioWorm
-A very simple media player and media library.
+
+# A very simple media player and media library.
 
 ## Requirements
 * Python >= 3.5.2
