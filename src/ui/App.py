@@ -151,6 +151,10 @@ class App(Gtk.Window):
 
         GLib.timeout_add(50, self.update_progress_bar)
 
+        self.set_icon_from_file("./assets/Audioworm_Logo.png")
+        self.connect("destroy", Gtk.main_quit)
+        self.show_all()
+
     def load_database(self, widget):
         """
         Loads all the songs from the database and updates the treeview.
@@ -302,10 +306,3 @@ class App(Gtk.Window):
             if (self.player.player.get_length() != 0):
                 self.progressbar.set_fraction(self.player.player.get_time()/self.player.player.get_length())
         return True
-
-
-win = App()
-win.set_icon_from_file("./assets/Audioworm_Logo.png")
-win.connect("destroy", Gtk.main_quit)
-win.show_all()
-Gtk.main()
