@@ -16,5 +16,6 @@ setup(
     author = "Mauricio Carrasco Ruiz",
     author_email = "maucarrui@ciencias.unam.mx",
     description = ("A very simple media player and media library."),
+    install_requires = ['mutagen', 'python-vlc'],
     test_suite = "src.test",
 )
