@@ -49,24 +49,6 @@ class SearchWindow(Gtk.Window):
 
         self.notebook.append_page(self.page1, Gtk.Label('General'))
 
-        self.page2 = Gtk.ListBox()
-        self.page2.set_border_width(10)
-
-        self.performer_entry = Gtk.Entry()
-        self.album_entry = Gtk.Entry()
-        self.song_entry = Gtk.Entry()
-
-        self.page2.add(Gtk.Label('Busqueda Avanzada'))
-        self.page2.add(Gtk.Label('Artista/Grupo'))
-        self.page2.add(self.performer_entry)
-        self.page2.add(Gtk.Label('Album'))
-        self.page2.add(self.album_entry)
-        self.page2.add(Gtk.Label('Rola'))
-        self.page2.add(self.song_entry)
-        self.page2.add(self.search_button_adv)
-
-        self.notebook.append_page(self.page2, Gtk.Label('Avanzada'))
-
         self.show_all()
 
     def general_search(self, button):
