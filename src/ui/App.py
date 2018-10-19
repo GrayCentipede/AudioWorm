@@ -96,7 +96,7 @@ class App(Gtk.Window):
         self.label_2.set_xalign(0)
 
         self.progressbar = Gtk.ProgressBar()
-        self.progressbar.set_text("0:00 - 0:00")
+        self.progressbar.set_text("--:-- | --:--")
         self.progressbar.set_show_text(True)
 
         pixbuf2 = GdkPixbuf.Pixbuf.new_from_file_at_scale( filename='./assets/default_album_icon.png',
@@ -109,6 +109,7 @@ class App(Gtk.Window):
         self.search.connect('clicked', self.open_search_window)
         edit_img = Gtk.Image.new_from_icon_name('edit-find-symbolic', Gtk.IconSize.BUTTON)
         self.search.set_image(edit_img)
+        self.search.set_sensitive(False)
         self.grid.attach_next_to(self.search, self.buttons[-1], Gtk.PositionType.RIGHT, 1, 1)
 
         self.load = Gtk.Button()
@@ -137,6 +138,7 @@ class App(Gtk.Window):
         self.miner_controller.add_rows()
         self.spinner.stop()
         self.load.set_sensitive(False)
+        self.search.set_sensitive(True)
 
     def seed_treeview(self):
         self.spinner.start()
@@ -209,7 +211,7 @@ class App(Gtk.Window):
                               "Performer: ... \n")
         self.label_2.set_text("Album: ... \n"
                               "Year: ... \n")
-        self.progressbar.set_text('{} - {}'.format('00:00', '00:00'))
+        self.progressbar.set_text('{} | {}'.format('--:--', '--:--'))
         self.progressbar.set_fraction(0/1)
 
         pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_scale(filename='./assets/default_album_icon.png',
@@ -220,6 +222,7 @@ class App(Gtk.Window):
     def show_data(self, selection):
         model, treeiter = selection.get_selected()
         if treeiter is not None:
+            self.buttons[0].set_sensitive(False)
             self.buttons[1].set_sensitive(True)
             self.buttons[2].set_sensitive(True)
             self.selected_song = model[treeiter]
@@ -232,7 +235,7 @@ class App(Gtk.Window):
             miliseconds = self.player.player.get_time() / 1000
             mm, ss = divmod(miliseconds, 60)
             self.current_time = "%02d:%02d" % (mm,ss)
-            self.progressbar.set_text('{} - {}'.format(self.current_time, self.player.get_length()))
+            self.progressbar.set_text('{} | {}'.format(self.current_time, self.player.get_length()))
             if (self.player.player.get_length() != 0):
                 self.progressbar.set_fraction(self.player.player.get_time()/self.player.player.get_length())
         return True
