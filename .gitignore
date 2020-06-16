@@ -1,0 +1,5 @@
+# Ignore compiled python files:
+__pycache__/
+
+# Ignore SQLITE database file:
+audioworm.db
