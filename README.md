@@ -6,6 +6,7 @@
 * Python >= 3.5.2
 * python-vlc >= 3.0.4106
 * mutagen >= 1.41.1
+* Pillow >= 7.1.2
 * Python Gtk+3 >= 3.4
 * setuptools
 * pydoc
@@ -34,6 +35,12 @@ pip3 install python-vlc
 All the ```MP3 ID3``` tags loaded thanks to ```Mutagen```
 ```
 pip3 install mutagen
+```
+
+### Pillow
+For image support.
+```
+pip3 install Pillow
 ```
 
 # Installing via ```setuptools```
