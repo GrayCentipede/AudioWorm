@@ -4,6 +4,7 @@
 
 ## Requirements
 * Python >= 3.5.2
+* vlc >= 3.0.8.2
 * python-vlc >= 3.0.4106
 * mutagen >= 1.41.1
 * Pillow >= 7.1.2
