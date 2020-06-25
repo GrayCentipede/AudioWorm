@@ -14,8 +14,8 @@ CREATE TABLE performers (
     FOREIGN KEY   (id_type) REFERENCES types(id_type)
 );
 
-CREATE TABLE persons (
-    id_person     INTEGER PRIMARY KEY,
+CREATE TABLE people (
+    id_people     INTEGER PRIMARY KEY,
     stage_name    TEXT,
     real_name     TEXT,
     birth_date    TEXT,
@@ -36,8 +36,8 @@ CREATE TABLE albums (
     year          INTEGER
 );
 
-CREATE TABLE rolas (
-    id_rola       INTEGER PRIMARY KEY,
+CREATE TABLE songs (
+    id_song       INTEGER PRIMARY KEY,
     id_performer  INTEGER,
     id_album      INTEGER,
     path          TEXT,
@@ -49,10 +49,24 @@ CREATE TABLE rolas (
     FOREIGN KEY   (id_album) REFERENCES albums(id_album)
 );
 
+CREATE TABLE playlists (
+    id_playlist   INTEGER PRIMARY KEY,
+    name          TEXT,
+    description   TEXT
+);
+
 CREATE TABLE in_group (
     id_person     INTEGER,
     id_group      INTEGER,
     PRIMARY KEY   (id_person, id_group),
-    FOREIGN KEY   (id_person) REFERENCES persons(id_person),
+    FOREIGN KEY   (id_person) REFERENCES people(id_people),
     FOREIGN KEY   (id_group) REFERENCES  groups(id_group)
+);
+
+CREATE TABLE in_playlist (
+    id_playlist   INTEGER,
+    id_song       INTEGER,
+    PRIMARY KEY   (id_song, id_song),
+    FOREIGN KEY   (id_song) REFERENCES songs(id_song),
+    FOREIGN KEY   (id_playlist) REFERENCES playlists(id_playlist)
 );
