@@ -1,5 +1,5 @@
 """
-A class for the miner, responsible of mining all the music files.
+A class for the miner, responsible for mining all the music files.
 To generate HTML documentation for this module use the command:
 
     pydoc -w src.Miner
