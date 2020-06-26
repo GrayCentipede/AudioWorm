@@ -56,10 +56,10 @@ CREATE TABLE playlists (
 );
 
 CREATE TABLE in_group (
-    id_person     INTEGER,
+    id_people     INTEGER,
     id_group      INTEGER,
-    PRIMARY KEY   (id_person, id_group),
-    FOREIGN KEY   (id_person) REFERENCES people(id_people),
+    PRIMARY KEY   (id_people, id_group),
+    FOREIGN KEY   (id_people) REFERENCES people(id_people),
     FOREIGN KEY   (id_group) REFERENCES  groups(id_group)
 );
 
