@@ -27,15 +27,16 @@ class Manager(object):
     # SQL path. Hard Coded.
     sql_path      = './sql/rolas.sql'
 
-    def create_database(self, clean = False, recreate = False):
+    def build_database(self, clean = False, rebuild = False):
         """
-        Creates the file where the database will be allocated.
+        Creates the file where the database will be allocated and 
+        builds the database.
         :param clean: boolean for a clean installation of the database.
             If True and the database already exists, then all of the 
             database contents are deleted, leaving the database clean.
-        :param recreate: boolean for a recreation of the database file.
+        :param rebuild: boolean for a rebuilding of the database.
             If True and the database file exists, then the file is deleted
-            and created again.
+            and the database is built again.
         """
         conn = sqlite3.connect(self.database_path)
 
@@ -45,8 +46,8 @@ class Manager(object):
             if clean:
                 self.clean_database()
         else:
-            # If the file needs to be recreated then delete it.
-            if recreate:
+            # If the database needs to be rebuilt.
+            if rebuild:
                 self.delete_database()
                 
             # Loads the sql file contents.
