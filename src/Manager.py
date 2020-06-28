@@ -64,7 +64,7 @@ class Manager(object):
         database clean.
         """
         # If the database file doesn't exist then raise an exception.
-        if (os.path.isfile(self.database_path):
+        if (not os.path.isfile(self.database_path)):
             raise FileNotFoundError(errno.ENOENT,
                                     os.strerror(errno.ENOENT),
                                     self.database_path)
@@ -79,6 +79,8 @@ class Manager(object):
         c.execute('DELETE FROM albums')
         c.execute('DELETE FROM songs')
         c.execute('DELETE FROM playlists')
+        c.execute('DELETE FROM in_group')
+        c.execute('DELETE FROM in_playlist')
             
         conn.commit()
         conn.close()
@@ -89,7 +91,7 @@ class Manager(object):
         Deletes the file where the database is allocated.
         """
         # If the database file doesn't exist then raise an exception.
-        if (os.path.isfile(self.database_path):
+        if (not os.path.isfile(self.database_path)):
             raise FileNotFoundError(errno.ENOENT,
                                     os.strerror(errno.ENOENT),
                                     self.database_path)
