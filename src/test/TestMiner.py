@@ -42,7 +42,6 @@ class TestMiner(unittest.TestCase):
                 f_name, f_ext = os.path.splitext(f)
                 if (f_ext in acc):
                     abs_path_f = root + f
-                    print(abs_path_f)
                     self.assertTrue(abs_path_f in files)
 
 
