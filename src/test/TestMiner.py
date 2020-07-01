@@ -33,7 +33,7 @@ class TestMiner(unittest.TestCase):
         Tests the miner's method mine.
         """
         self.test_miner.mine()
-        files = self.test_miner.get_files()
+        mined = self.test_miner.get_files()
         acc   = self.test_miner.get_accepted_formats()
 
         # Checks that every file with an accepted format is properly obtained.
@@ -42,7 +42,7 @@ class TestMiner(unittest.TestCase):
                 f_name, f_ext = os.path.splitext(f)
                 if (f_ext in acc):
                     abs_path_f = root + f
-                    self.assertTrue(abs_path_f in files)
+                    self.assertTrue(abs_path_f in mined)
 
 
 if __name__ == '__main__':
