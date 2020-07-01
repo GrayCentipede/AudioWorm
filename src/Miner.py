@@ -1,5 +1,6 @@
 """
 A class for the miner, responsible for mining all the music files.
+
 To generate HTML documentation for this module use the command:
 
     pydoc -w src.Miner
@@ -39,5 +40,19 @@ class Miner(object):
             for f in files:
                 f_name, f_ext = os.path.splitext(f)
                 if (f_ext in self.acc_formats):
-                    abs_path_f = root + '/' + f
+                    abs_path_f = root + f
                     self.files.append(abs_path_f)
+
+    def get_accepted_formats(self):
+        """
+        Returns the accepted formats of the miner.
+        :return: the accepted formats of the miner.
+        """
+        return self.acc_formats
+
+    def get_files(self):
+        """
+        Returns the mined files.
+        :return: the mined files.
+        """
+        return self.files
