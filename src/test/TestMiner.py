@@ -1,60 +1,50 @@
+"""
+A class for testing the miner called TestMiner.
+"""
+
+# Unit testing.
 import unittest
+
+# Ignore warnings.
 import warnings
+
+# Checking files.
 import os
 
+# Miner class.
 from ..Miner import Miner
 
 class TestMiner(unittest.TestCase):
-    path = './src/test/assets/audio/'
-    miner = None
+    
+    # The path where the test files are allocated.
+    path = 'assets/audio/'
 
-    def setUp(self):
-        warnings.simplefilter("ignore", ResourceWarning)
-        self.miner = Miner('audioworm_test')
-        self.miner.load_db(self.path)
+    # The absolute path of the directory where the project is running.
+    pre  = os.path.dirname(os.path.abspath(__file__))
 
-    def test_error_load(self):
-        warnings.simplefilter("ignore", ResourceWarning)
-        decoy_miner = Miner('audioworm_test')
-        self.assertRaises(FileNotFoundError, decoy_miner.load_db, './src/test/assets/non-existant-dir/')
+    # The absoulte path of the test files.
+    test_path = pre + '/' + path
 
-    def test_songs(self):
-        query = 'SELECT title FROM rolas'
-        songs = []
-        songs.append('Dark Step')
-        songs.append('Doll Dancing')
-        songs.append('Drizzle to Downpour')
-        songs.append('Fur Elise (by Beethoven)')
-        songs.append('Toccata in D minor (by Bach)')
-        songs.append('Unknown Song')
-        rows = self.miner.send_query(query)
-        for row in rows:
-            self.assertTrue(row[0] in songs)
+    # The test miner.
+    test_miner = Miner(test_path)
 
-    def test_performers(self):
-        query = 'SELECT name FROM performers'
-        performers = []
-        performers.append('Silent Partner')
-        performers.append('Puddle of Infinity')
-        performers.append('Beethoven')
-        performers.append('Bach')
-        performers.append('Unknown Artist')
-        rows = self.miner.send_query(query)
-        for row in rows:
-            self.assertTrue(row[0] in performers)
+    def test_mine(self):
+        """
+        Tests the miner's method mine.
+        """
+        self.test_miner.mine()
+        files = self.test_miner.get_files()
+        acc   = self.test_miner.get_accepted_formats()
 
-    def test_albums(self):
-        query = 'SELECT name FROM albums'
-        albums = []
-        albums.append('YouTube Audio Library')
-        albums.append('Unknown Album')
-        rows = self.miner.send_query(query)
-        for row in rows:
-            self.assertTrue(row[0] in albums)
+        # Checks that every file with an accepted format is properly obtained.
+        for root, dirs, files in os.walk(self.test_path):
+            for f in files:
+                f_name, f_ext = os.path.splitext(f)
+                if (f_ext in acc):
+                    abs_path_f = root + f
+                    print(abs_path_f)
+                    self.assertTrue(abs_path_f in files)
 
 
 if __name__ == '__main__':
-
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestMiner)
-    unittest.TextTestRunner(verbosity=2, warnings = 'ignore').run(suite)
-    os.unlink('./sql/audioworm_test.db')
+    unittest.main()
