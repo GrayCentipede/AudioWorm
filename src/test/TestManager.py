@@ -54,11 +54,12 @@ class TestManager(unittest.TestCase):
         conn = sqlite3.connect(self.test_path)
         c    = conn.cursor()
 
-        query  = 'INSERT INTO performers (id_performer, id_type, name)'
-        query += ' VALUES (1, 0, TEST)'
+        query  = 'INSERT INTO performers(id_type, name)'
+        query += ' VALUES(?, ?)'
 
-        c.execute(query)
-        c.commit()
+        c.execute(query, (0, 'TEST'))
+        
+        conn.commit()
 
         # Clean database.
         self.test_manager.build_database(clean = True)
