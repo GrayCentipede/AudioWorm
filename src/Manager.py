@@ -21,11 +21,15 @@ class Manager(object):
     creation, deletion and queries.
     """
 
-    # The path to the file where the database is allocated. Hard Coded.
-    database_path = './sql/audioworm.db'
-
     # SQL path. Hard Coded.
     sql_path      = './sql/rolas.sql'
+
+    def __init__(self, db_name):
+        """
+        Creates a manager.
+        :param db_name: the database name.
+        """
+        self.database_path = './sql/' + db_name + '.db'
 
     def build_database(self, clean = False, rebuild = False):
         """
@@ -40,21 +44,18 @@ class Manager(object):
         """
         conn = sqlite3.connect(self.database_path)
 
-        # Checks if the database file already exists.
-        if (os.path.isfile(self.database_path)):
-            # If it is a clean installation then clean the database.
-            if clean:
-                self.clean_database()
-        else:
-            # If the database needs to be rebuilt.
+        # Checks if database is empty or needs to be rebuilt.
+        if (os.stat(self.database_path).st_size == 0 or rebuild):
             if rebuild:
                 self.delete_database()
-                
+
             # Loads the sql file contents.
-            f = open(sql_path, 'r')
+            f = open(self.sql_path, 'r')
             c = f.read()
-            # Executes and creates the database.
             conn.executescript(c)
+            
+        elif clean:
+            self.clean_database()
 
         conn.close()
 
@@ -70,18 +71,18 @@ class Manager(object):
                                     self.database_path)
 
         # Cleans the database.
-        conn = sqlite3.connect('./sql/audioworm.db')
+        conn = sqlite3.connect(self.database_path)
         c    = conn.cursor()
 
         c.execute('DELETE FROM performers')
-        c.execute('DELELE FROM people')
+        c.execute('DELETE FROM people')
         c.execute('DELETE FROM groups')
         c.execute('DELETE FROM albums')
         c.execute('DELETE FROM songs')
         c.execute('DELETE FROM playlists')
         c.execute('DELETE FROM in_group')
         c.execute('DELETE FROM in_playlist')
-            
+
         conn.commit()
         conn.close()
 
