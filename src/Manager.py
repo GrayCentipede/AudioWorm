@@ -53,6 +53,7 @@ class Manager(object):
             f = open(self.sql_path, 'r')
             c = f.read()
             conn.executescript(c)
+            f.close()
             
         elif clean:
             self.clean_database()
