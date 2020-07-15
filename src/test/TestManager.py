@@ -71,6 +71,56 @@ class TestManager(unittest.TestCase):
         # Deletes the database created.
         os.unlink(self.test_path)
 
+    def test_insert_performer(self):
+        """
+        Tests the manager's method insert_performer.
+        """
+        # Builds database and inserts performer.
+        self.test_manager.build_database()
+        self.test_manager.insert_performer('Test Artist')
+
+        # Check if it was inserted.
+        conn = sqlite3.connect(self.test_path)
+        c    = conn.cursor()
+        
+        query = 'SELECT * FROM performers WHERE name=?'
+        res   = c.execute(query, ('Test Artist',)).fetchone()
+        self.assertFalse(res is None)
+
+        # Deletes the created database.
+        os.unlink(self.test_path)
+
+    def test_insert_person(self):
+        """
+        Tests the manager's method insert_person.
+        """
+        pass
+
+    def test_insert_group(self):
+        """
+        Tests the manager's method insert_group.
+        """
+        pass
+
+    def test_insert_album(self):
+        """
+        Tests the manager's method insert_album.
+        """
+        pass
+
+    def test_insert_song(self):
+        """
+        Tests the manager's method insert_song.
+        """
+        pass
+
+    def test_insert_playlist(self):
+        """
+        Tests the manager's method insert_playlist.
+        """
+        pass
+        
+
 
 if __name__ == '__main__':
     unittest.main()
